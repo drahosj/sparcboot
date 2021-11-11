@@ -51,7 +51,17 @@ bios_uart_getc:
     retl
     and     %o0, 0xff, %o0
 
-    .global bios_uart_getline
-bios_uart_getline:
+    .global bios_uart_getc_nonblock
+bios_uart_getc_nonblock:
+    set     UART_BASE, %o2
+    
+    ld      [%o2 + UART_STATUS_OFFSET], %o3
+    btst    UART_STATUS_DR, %o3
+    bz,a    1f
+    set     -1, %o0
+
+    ld      [%o2 + UART_DATA_OFFSET], %o0
+    and     %o0, 0xff, %o0
+1:
     retl
     nop

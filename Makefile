@@ -9,7 +9,7 @@ LIBDIR=$(HOME)/cross/$(PREFIX)/lib
 CFLAGS=-g
 ASFLAGS=-g
 
-OBJECTS=uart.o bios_uart.o trap.o startup.o main.o window.o bios.o
+OBJECTS=uart.o bios_uart.o trap.o startup.o main.o window.o bios.o xmodem.o
 
 default: bootram.elf
 

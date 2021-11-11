@@ -3,6 +3,8 @@
 
 #include <string.h>
 
+extern int xmodem_recv(unsigned int addr);
+
 void f9() { bios_puts("Made it to 9\r\n"); }
 void f8() { f9(); bios_puts("f8 returning\r\n");}
 void f7() { f8(); bios_puts("f7 returning\r\n");}
@@ -134,6 +136,24 @@ int main()
                   bios_putc('\n');
             } else if (!strcmp("taco", buf)) {
                   bios_puts("Taco command executed!\n");
+            } else if (!strcmp("wait", buf)) {
+                  bios_puts("Wait\n");
+                  bios_wait(1000);
+            } else if (!strcmp("xrecv", buf)) {
+                  int ret = xmodem_recv(0x40010000);
+                  bios_getc();
+                  bios_putc('\n');
+                  if (ret > 0) {
+                        bios_puts("Received bytes: ");
+                        putn(ret);
+                        bios_putc('\n');
+                  } else {
+                        bios_puts("Err: ");
+                        putn(ret);
+                        bios_putc('\n');
+                  }
+            } else if (!strcmp("disp", buf)) {
+                  bios_puts((char *)0x40010000);
             } else {
                   bios_puts("Invalid command\n");
             }

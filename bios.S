@@ -1,5 +1,4 @@
 /* Extern'd BIOS implementations */
-.extern isr_uart_puts
 
 #define LONG_JUMP(x)            \
     sethi   %hi(x), %o5;        \
@@ -25,8 +24,8 @@ bios_table:
     LONG_JUMP(uart_putc)
     LONG_JUMP(bios_uart_puts)
     LONG_JUMP(bios_uart_getc)
-    LONG_JUMP(_bios_unimpl)
-    LONG_JUMP(_bios_unimpl)
+    LONG_JUMP(bios_uart_getc_nonblock)
+    LONG_JUMP(bios_busywait)
     LONG_JUMP(_bios_unimpl)
     LONG_JUMP(_bios_unimpl)
     LONG_JUMP(_bios_unimpl)
@@ -40,3 +39,18 @@ bios_table:
     LONG_JUMP(_bios_unimpl)
     LONG_JUMP(_bios_unimpl)
     LONG_JUMP(_bios_unimpl)
+
+bios_busywait:
+    cmp     %o0, 0
+    bz      1f
+    set     30000, %o1
+2:
+    deccc   %o1
+    bnz     2b
+    nop
+    ba      bios_busywait
+    dec     %o0
+    
+1:
+    retl
+    nop

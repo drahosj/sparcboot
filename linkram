@@ -156,7 +156,8 @@ SECTIONS
 bios_putc = BIOS_TABLE_START + 0x00;
 bios_puts = BIOS_TABLE_START + 0x10;
 bios_getc = BIOS_TABLE_START + 0x20;
-bios_getline = BIOS_TABLE_START + 0x30;
+bios_getc_nb = BIOS_TABLE_START + 0x30;
+bios_wait = BIOS_TABLE_START + 0x40;
 
 bios_readline = BIOS_TABLE_START + 0x80;
 
