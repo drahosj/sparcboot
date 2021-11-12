@@ -7,7 +7,7 @@
 
     .global xmodem_recv
 xmodem_recv:
-    save
+    save    %sp, -96, %sp
     mov     %i0, %i1
     set     1, %l0
 

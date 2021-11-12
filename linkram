@@ -161,4 +161,6 @@ bios_wait = BIOS_TABLE_START + 0x40;
 
 bios_readline = BIOS_TABLE_START + 0x80;
 
+bios_write = BIOS_TABLE_START + 0x100;
+
 ENTRY(TRAP_TABLE_START)

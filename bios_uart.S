@@ -25,6 +25,31 @@ bios_uart_puts:
     retl
     nop
 
+    .global bios_uart_write
+bios_uart_write:
+    set     UART_BASE, %o2
+3:
+    deccc   %o1
+    bneg    1f
+    nop
+
+    ldub    [%o0], %o4
+
+/* Wait for TE */
+2:
+    ld      [%o2 + UART_STATUS_OFFSET], %o3
+    andcc   %o3, UART_STATUS_TE, %g0
+    bz      2b
+    nop
+
+    stub    %o4, [%o2 + UART_DATA_OFFSET]
+    ba      3b
+    add     %o0, 1, %o0
+
+1: 
+    retl
+    nop
+
     .global bios_uart_putc
 bios_uart_putc:
     set     UART_BASE, %o2

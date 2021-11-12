@@ -40,6 +40,16 @@ bios_table:
     LONG_JUMP(_bios_unimpl)
     LONG_JUMP(_bios_unimpl)
 
+/* BIOS = 0x100 */
+    LONG_JUMP(bios_uart_write)
+    LONG_JUMP(_bios_unimpl)
+    LONG_JUMP(_bios_unimpl)
+    LONG_JUMP(_bios_unimpl)
+    LONG_JUMP(_bios_unimpl)
+    LONG_JUMP(_bios_unimpl)
+    LONG_JUMP(_bios_unimpl)
+    LONG_JUMP(_bios_unimpl)
+
 bios_busywait:
     cmp     %o0, 0
     bz      1f

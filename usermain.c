@@ -11,7 +11,9 @@ int main()
       bios_puts("USER> ");
       bios_readline(buf, 128);
 
-      if (strcmp("fib", strtok(buf, " "))) {
+      char * cmd = strtok(buf, " ");
+
+      if (!strcmp("fib", cmd)) {
             bios_puts("Executing fib...\n");
             return fib(strtol(strtok(NULL, " "), NULL, 0));
       }

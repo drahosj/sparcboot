@@ -2,32 +2,25 @@
     .align 32
     .global .div
 .div:
-    mov     0, %o2
-    ba      2f
+    sra     %o0, 0x1f, %o2
+    wr      %o2, %y
     nop
-1:
-    inc     %o2
-    sub     %o0, %o1, %o0
-2:
-    cmp     %o0, %o1
-    bge     1b
     nop
-    mov     %o2, %o0
-    jmp     %o7+4
     nop
+    sdiv    %o0, %o1, %o0
+    retl
 
     .global .rem
 .rem:
-    ba      2f
+    sra     %o0, 0x1f, %o2
+    wr      %o2, %y
     nop
-1:
+    nop
+    nop
+    sdiv    %o0, %o1, %o2
+    smul    %o2, %o1, %o1
     sub     %o0, %o1, %o0
-2:
-    cmp     %o0, %o1
-    bge     1b
-    nop
-    jmp     %o7+4
-    nop
+    retl
 
     .global .udiv
 .udiv:

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 extern int xmodem_recv(unsigned int addr);
+extern void shell_entry(void);
 
 void f9() { bios_puts("Made it to 9\r\n"); }
 void f8() { f9(); bios_puts("f8 returning\r\n");}
@@ -41,7 +42,7 @@ void putn(int n)
             n = -n;
             bios_puts("-");
       }
-      
+
       if (n > 0) {
             do {
                   buf[i++] = (n % 10) + 0x30;
@@ -132,6 +133,9 @@ int main()
       putn(atoi("324"));
       bios_putc('\n');
 
+
+      shell_entry();
+
       for(;;) {
             bios_puts("BOOTLOADER> ");
             bios_readline(buf, 128);
@@ -187,4 +191,16 @@ int main()
                   bios_puts("Invalid command\n");
             }
       }
+}
+
+void __assert(char * file, char * line, char * expr)
+{
+      bios_puts("Assert failure: ");
+      bios_puts(file);
+      bios_puts("(");
+      bios_puts(line);
+      bios_puts("): ");
+      bios_puts(expr);
+      bios_puts("\n");
+      for(;;);
 }
