@@ -10,7 +10,7 @@ CFLAGS=-g -mcpu=v8
 ASFLAGS=-g
 
 OBJECTS=uart.o bios_uart.o trap.o startup.o main.o window.o bios.o xmodem.o \
-		muldiv.o
+		muldiv.o shell.o
 
 USERCODE_OBJECTS=usermain.o muldiv.o
 
@@ -26,4 +26,4 @@ usercode.bin: usercode.elf
 	$(PREFIX)-objcopy -O binary usercode.elf usercode.bin
 
 clean:
-	rm -f *.o *.elf
+	rm -f *.o *.elf *.bin

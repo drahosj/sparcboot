@@ -1,5 +1,6 @@
 #include "uart.h"
 #include "bios.h"
+#include "shell.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -132,59 +133,8 @@ int main()
       putn(atoi("324"));
       bios_putc('\n');
 
-      for(;;) {
-            bios_puts("BOOTLOADER> ");
-            bios_readline(buf, 128);
 
-            char * cmd = strtok(buf, " ");
+      shell_entry();
 
-            if (!strcmp("help", cmd)) {
-                  bios_puts("Supported commands: \n\thelp\n\ttaco\n");
-                  bios_putc('\n');
-            } else if (!strcmp("taco", cmd)) {
-                  bios_puts("Taco command executed!\n");
-            } else if (!strcmp("wait", cmd)) {
-                  int time = strtol(strtok(NULL, " "), NULL, 0);
-                  bios_puts("Wait\n");
-                  bios_wait(time);
-            } else if (!strcmp("xrecv", cmd)) {
-                  unsigned long offset = strtol(strtok(NULL, " "), NULL, 0);
-                  if (offset == 0) {
-                        bios_puts("Missing offset\n");
-                        continue;
-                  }
-                  bios_puts("Loading to offset ");
-                  putn(offset);
-                  bios_putc('\n');
-                  int ret = xmodem_recv(0x40010000);
-                  bios_getc();
-                  bios_putc('\n');
-                  if (ret > 0) {
-                        bios_puts("Received bytes: ");
-                        putn(ret);
-                        bios_putc('\n');
-                  } else {
-                        bios_puts("Err: ");
-                        putn(ret);
-                        bios_putc('\n');
-                  }
-            } else if (!strcmp("disp", cmd)) {
-                  bios_puts((char *)0x40010000);
-            } else if (!strcmp("go", cmd)) {
-                  unsigned long offset = strtol(strtok(NULL, " "), NULL, 0);
-                  if (offset == 0) {
-                        bios_puts("Missing offset\n");
-                        continue;
-                  }
-                  bios_puts("Go ");
-                  putn(offset);
-                  bios_putc('\n');
-                  int ret = ((int (*)(void)) offset)();
-                  bios_puts("User code returned: ");
-                  putn(ret);
-                  bios_putc('\n');
-            } else {
-                  bios_puts("Invalid command\n");
-            }
-      }
+      for(;;);
 }

@@ -197,6 +197,16 @@ _fsrxx:
 	sub %fp, %g1, %fp
 	sub %fp, 96, %sp
 
+    set __bss_start, %g1
+    set _end, %g2
+
+1:
+    clr [%g1]
+    add %g1, 4, %g1
+    cmp %g1, %g2
+    bne 1b  
+    nop
+
 	set main, %g1
 
 	jmp %g1
