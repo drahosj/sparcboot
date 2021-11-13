@@ -11,8 +11,12 @@
 
 #define MMU_CTRL_EN 0x01
 
-#define MMU_CTXT_TBLSIZE 0x400
-#define MMU_L1_TBLSIZE 0x400
-#define MMU_L23_TBLSIZE 0x100
+#define MMU_CTXT_NENTS 0x100
+#define MMU_L1_NENTS 0x100
+#define MMU_L23_NENTS 0x40
+
+#define MMU_CTXT_TBLSIZE (MMU_CTXT_NENTS << 2)
+#define MMU_L1_TBLSIZE (MMU_L1_NENTS << 2)
+#define MMU_L23_TBLSIZE (MMU_L23_NENTS << 2)
 
 #endif

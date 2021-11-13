@@ -79,6 +79,7 @@ static struct command cmd_help = {
       .fn = fn_help
 };
 
+extern int save_shell_frame(void);
 static int fn_go()
 {
       char * offset_str = strtok(NULL, " ");
@@ -94,11 +95,17 @@ static int fn_go()
       bios_puts("\nGo ");
       putn(offset);
       bios_putc('\n');
-      int ret = ((int (*)(void)) offset)();
-      bios_puts("User code returned: ");
-      putn(ret);
-      bios_putc('\n');
 
+      if (save_shell_frame()) {
+            int ret = ((int (*)(void)) offset)();
+            bios_puts("User code returned: ");
+            putn(ret);
+            bios_putc('\n');
+            return 0;
+      } else {
+            bios_puts("Recovered from segfault\n");
+      }
+      return 0;
 }
 
 static struct command cmd_go = {
