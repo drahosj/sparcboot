@@ -1,0 +1,42 @@
+BOOTLOADER> help
+        help    - Help command
+        xrecv   - xrecv <addr>: load over xmodem to addr
+        go      - go <addr>: begin execution at addr
+        get     - get <var>: get variabl
+        mmu-init        - Initialize MMU and register initial pages for context 0
+        mmu-en  - Set MMU as enabled
+        mmu-dis - Set MMU as disabled
+        mmu-map - mmu-map <P> <V>: Map physical P at virtual address V
+
+BOTLOADER> xrecv 0x40010000
+Loading to offset 1073807360
+
+Received bytes: 3584
+BOOTLOADER> mmu-init
+Context start: 0x40002000
+L1 table space: 0x40003000
+L23 table space: 0x40005000
+Mapping P(0x40000000) at V(0x40000000)
+Allocating new L1 table
+
+...
+
+L2 index: 0x0
+Allocating L3 table
+L3 table: 0x40005500
+L3 index: 0x0
+PTE value: 0x800000e
+BOOTLOADER> mmu-en
+BOOTLOADER> mmu-map 0x40010000 0x00
+Mapping P(0x40010000) at V(0x0)
+L1 table: 0x40003000
+L1 index: 0x0
+Allocating L2 table
+L2 table: 0x40005600
+L2 index: 0x0
+Allocating L3 table
+L3 table: 0x40005700
+L3 index: 0x0
+PTE value: 0x400100e
+BOOTLOADER>
+

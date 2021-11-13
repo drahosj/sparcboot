@@ -53,24 +53,15 @@ LEON_REG = 0x80000000;
 
 MEMORY
 {
-  ram     : ORIGIN = 0x40000000, LENGTH = 128M
+  ram     : ORIGIN = 0x00001000, LENGTH = 128M
 }
 
 SECTIONS
 {
   .text :
   {
-    /* Begin with trap table at reset address */
-    TRAP_TABLE_START = .;
-    *(.text.tt);
-    . = ALIGN(0x1000);
-    BIOS_TABLE_START = .;
-    *(.text.bios);
-    . = ALIGN(0x1000);
-    _pt_start = .;
-    . += 0x4000;
-    _pt_end = .;
-
+    /* HACK - main.o at beginning */
+    usermain.o(.text)
     CREATE_OBJECT_SYMBOLS
     text_start = .;
     _text_start = .;
@@ -156,6 +147,8 @@ SECTIONS
   }
 }
 
+BIOS_TABLE_START = 0x40001000;
+
 bios_putc = BIOS_TABLE_START + 0x00;
 bios_puts = BIOS_TABLE_START + 0x10;
 bios_getc = BIOS_TABLE_START + 0x20;
@@ -164,4 +157,4 @@ bios_wait = BIOS_TABLE_START + 0x40;
 
 bios_readline = BIOS_TABLE_START + 0x80;
 
-ENTRY(TRAP_TABLE_START)
+ENTRY(main)

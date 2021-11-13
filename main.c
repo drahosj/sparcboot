@@ -43,18 +43,39 @@ void putn(int n)
             bios_puts("-");
       }
       
-      if (n > 0) {
-            do {
-                  buf[i++] = (n % 10) + 0x30;
-                  n = n / 10;
-            } while (n > 0);
-      }
+      do {
+            buf[i++] = (n % 10) + 0x30;
+            n = n / 10;
+      } while (n > 0);
 
       char buf2[256];
       for (int j = 0; j < i; j++) {
             buf2[j] = buf[(i - j) - 1];
       }
       buf2[i] = '\0';
+      bios_puts(buf2);
+}
+
+void puth(unsigned int n)
+{
+      char buf[256];
+      int i = 0;
+
+      do {
+            char c = (n % 16) + 0x30;
+            if (c > '9') {
+                  c += 0x27;
+            }
+            buf[i++] = c;
+            n = n / 16;
+      } while (n > 0);
+
+      char buf2[256];
+      for (int j = 0; j < i; j++) {
+            buf2[j] = buf[(i - j) - 1];
+      }
+      buf2[i] = '\0';
+      bios_puts("0x");
       bios_puts(buf2);
 }
 
@@ -131,6 +152,10 @@ int main()
 
       bios_puts("324 is ");
       putn(atoi("324"));
+      bios_putc('\n');
+
+      bios_puts("0x3bfa is ");
+      puth(strtol("0x3bfa", NULL, 0));
       bios_putc('\n');
 
 

@@ -1,5 +1,6 @@
 #include "shell.h"
 #include "bios.h"
+#include "mmu.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -90,11 +91,7 @@ static int fn_go()
             }
             offset = var->val;
       }
-      bios_puts("Loading to offset ");
-      if (offset == 0) {
-            bios_puts("Missing offset\n");
-      }
-      bios_puts("Go ");
+      bios_puts("\nGo ");
       putn(offset);
       bios_putc('\n');
       int ret = ((int (*)(void)) offset)();
@@ -187,6 +184,8 @@ void shell_entry()
       register_command(&cmd_xrecv);
       register_command(&cmd_go);
       register_command(&cmd_getvar);
+
+      register_mmu_commands();
 
       set_addr_var(&defuser_var);
       set_addr_var(&ramboot_var);
