@@ -4,3 +4,4 @@
 *.swp
 sim/build
 *.srec
+ahbrom.vhd

@@ -17,6 +17,8 @@ void uart_init()
 	struct uart * uart = (struct uart *) UART_BASE;
 	uart->control = 0x00000000;
 	uart->status = 0x00000000;
+      /* Computed for 9600 baud from 70 MHz sysclk */
+      uart->scaler = 911;
 	uart->control = UART_CONTROL_ENABLE_TX | UART_CONTROL_ENABLE_RX;
 }
 
