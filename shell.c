@@ -187,6 +187,7 @@ int register_command(struct command * new)
 
 void shell_entry()
 {
+      bios_puts("Bootloader entry");
       register_command(&cmd_help);
       register_command(&cmd_xrecv);
       register_command(&cmd_go);

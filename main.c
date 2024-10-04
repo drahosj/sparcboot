@@ -98,8 +98,9 @@ int main()
       uart_putc('\r');
       uart_putc('\n');
 
-      bios_puts("ISR UART TEST\r\n");
+      bios_puts("BIOS PUTS TEST\r\n");
       bios_puts("Second BIOS message\r\n");
+#if 0
       f1();
       bios_puts("Made it back\r\n");
 
@@ -158,8 +159,18 @@ int main()
       puth(strtol("0x3bfa", NULL, 0));
       bios_putc('\n');
 
+#endif
+      bios_puts(" -- IF THIS IS THE LAST THING YOU SEE -- \r\n");
+      bios_puts(" it's probably because the stock sim function of apbuart\r\n");
+      bios_puts("handles \\n wrong and only commits the line on \\r, \r\n");
+      bios_puts("\n\n");
+      bios_puts("Been using \\r\\n until now which is weird\r\n");
+      bios_puts("Need to patch grlib apbuart.vhd to print on LF not CR\r\n");
 
+      bios_puts("ends with just \n");
+      bios_puts("About to call shell_entry\n");
       shell_entry();
+      bios_puts("somehow shell returned\n");
 
       for(;;);
 }

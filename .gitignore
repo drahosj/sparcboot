@@ -2,3 +2,5 @@
 *.o
 *.bin
 *.swp
+sim/build
+*.srec

@@ -60,7 +60,7 @@ SECTIONS
 {
   .text :
   {
-    /* Begin with trap table at reset address */
+    /* Begin with trap table at entry address */
     TRAP_TABLE_START = .;
     *(.text.tt);
     . = ALIGN(0x1000);

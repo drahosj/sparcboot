@@ -14,7 +14,10 @@
 	.align	4
 	.global start
 start:
-
+! We get here via RESET trap probably
+! In sim, ahbrom jumps to 0x40000000, which has the
+! trap table loaded already, which jumps here
+! TRAP_TABLE_START = 0x40000000
 	flush
 	set 0x10e0, %g1		! init IU
 	mov %g1, %psr
@@ -53,6 +56,7 @@ start:
 	st	%g0, [%g2+0x54]
 #endif
 
+! Get NWINDOWS and zero all windows
 2:
 	mov %asr17, %g3
 	and %g3, 0x1f, %g3
@@ -81,6 +85,7 @@ start:
 	bge 1b
 	save
 
+! Set initial window
 	mov	2, %g1
 	mov	%g1, %wim
 	set 0x10e0, %g1		! enable traps
@@ -154,6 +159,7 @@ _fsrxx:
     st   %g2, [%g1]
 #endif
 
+#ifdef L2MCTRLIO
 	set L2MCTRLIO, %g1
 	set MCFG1, %g2
 	st  %g2, [%g1]
@@ -161,6 +167,8 @@ _fsrxx:
 	st  %g2, [%g1+4]
 	set MCFG3, %g2
 	st  %g2, [%g1+8]
+#endif
+
 !	set IRQCTRL, %g1
 !	set 0x0ffff, %g2
 !	st  %g2, [%g1+0x10]

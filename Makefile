@@ -14,7 +14,10 @@ OBJECTS=uart.o bios_uart.o trap.o startup.o main.o window.o bios.o xmodem.o \
 
 USERCODE_OBJECTS=usermain.o muldiv.o
 
-default: bootram.elf usercode.bin
+default: bootram.elf usercode.bin sim/ram.srec bootrom.elf
+
+sim/ram.srec: bootram.elf
+	$(PREFIX)-objcopy -O srec bootram.elf sim/ram.srec
 
 bootram.elf: $(OBJECTS) linkram
 	$(LD) -T linkram $(OBJECTS) -L$(LIBDIR) -lc -o bootram.elf
@@ -24,6 +27,9 @@ usercode.elf: $(USERCODE_OBJECTS) linkuser0
 
 usercode.bin: usercode.elf
 	$(PREFIX)-objcopy -O binary usercode.elf usercode.bin
+
+bootrom.elf: $(OBJECTS) linkrom
+	$(LD) -T linkrom $(OBJECTS) -L$(LIBDIR) -lc -o bootrom.elf
 
 clean:
 	rm -f *.o *.elf *.bin
