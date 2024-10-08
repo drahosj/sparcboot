@@ -1,6 +1,16 @@
 /* Template boot-code for LEON3 test benches */
 
-#include "prom.h"
+/* "absolute minimal" PROM example, just performs IU/FPU
+ * initialization and jump to RAM.
+ *
+ * This is suitable for sim usage where RAM can just be magically
+ * loaded, bss/data already set up, etc
+ * 
+ * Also suitable for external loading e.g. PCIe or debugger
+ *
+ */
+
+#include "prom-minimal.h"
 
 #ifndef STACKSIZE
 #define STACKSIZE 0x00020000
@@ -17,7 +27,7 @@ start:
 	set 0x10e0, %g1		! init IU
 	mov %g1, %psr
 	mov %g0, %wim
-	mov %g0, %tbr
+	mov %g0, %tbr       ! Should be changed by later startup code
 	mov %g0, %y
 	mov %g0, %asr16
 	nop
@@ -35,29 +45,14 @@ start:
 	nop
 	nop
 	nop
-#ifdef DSUADDR
-	set	DSUADDR, %g2
-	st	%g0, [%g2]
-	st	%g0, [%g2+0x08]
-	st	%g0, [%g2+0x20]
-	st	%g0, [%g2+0x24]
-	st	%g0, [%g2+0x40]
-	st	%g0, [%g2+0x44]
-	st	%g0, [%g2+0x50]
-	st	%g0, [%g2+0x54]
-	st	%g0, [%g2+0x58]
-	st	%g0, [%g2+0x5C]
-	st	%g0, [%g2+0x54]
-#endif
-
 2:
-	mov %asr17, %g3
+	mov %asr17, %g3     ! NWINDOWS
 	and %g3, 0x1f, %g3
 	mov %g0, %g4
 	mov %g0, %g5
 	mov %g0, %g6
 	mov %g0, %g7
-1:
+1:                      ! Zero locals loop
 	mov %g0, %l0
 	mov %g0, %l1
 	mov %g0, %l2
@@ -78,16 +73,19 @@ start:
 	bge 1b
 	save
 
+/*
+    Don't enable traps yet, TBR doesn't point at valid handlers
 	mov	2, %g1
 	mov	%g1, %wim
 	set 0x10e0, %g1		! enable traps
 	mov %g1, %psr
 	nop; nop; nop;
+*/
 
 	mov %psr, %g1
 	srl %g1, 12, %g1
 	andcc %g1, 1, %g0
-	be 1f
+	be 1f               ! Skip FPU init if !EF
 	nop
 
 	set _fsrxx, %g3
@@ -122,35 +120,17 @@ start:
 	nop
 	
 	
-.align	8
-_fsrxx:
-	.word 0
-	.word 0
-
 1:
 	mov %asr17, %g3
-	srl %g3, 28, %g3
+	srl %g3, 28, %g3        ! Processor index
 	andcc %g3, 0x0f, %g3
-	bne 1f
+	bne 1f                  ! Skip memory initialization if not CPU0
 
-#ifdef DDR2CTRLIO
-    set DDR2CTRLIO, %g1
-    set DDR2CFG1, %g2
-    st  %g2, [%g1]
-    set DDR2CFG3, %g2
-    st  %g2, [%g1+0x8]
-    set DDR2CFG4, %g2
-    st  %g2, [%g1+0xc]
-    set DDR2CFG5, %g2
-    st  %g2, [%g1+0x10]
+    /* DDR2 initialization removed */
 
-    set  DDR2CFG1, %g2
-    set  0x10000, %g1
-    or   %g2, %g1, %g2
-    set DDR2CTRLIO, %g1
-    st   %g2, [%g1]
-#endif
-
+    /* LEON2 RAM controller initialization
+     * Used for sim RAM
+     */
 	set L2MCTRLIO, %g1
 	set MCFG1, %g2
 	st  %g2, [%g1]
@@ -158,35 +138,27 @@ _fsrxx:
 	st  %g2, [%g1+4]
 	set MCFG3, %g2
 	st  %g2, [%g1+8]
-!	set IRQCTRL, %g1
-!	set 0x0ffff, %g2
-!	st  %g2, [%g1+0x10]
+	set IRQCTRL, %g1
+	set 0x0ffff, %g2
+	st  %g2, [%g1+0x10]
 
-#ifdef ASDCFG
-#ifndef SDCTRLPNP
-#define SDCTRLPNP 0xFFFFF860
-#endif
-	set SDCTRLPNP, %g1
-	ld  [%g1], %g2
-	srl %g2, 12, %g2
-	set 0x01009, %g1
-	subcc %g1, %g2, %g0
-	bne 1f
+    /* SD controller initialization removed */
 
-	set ASDCFG, %g1
-	set DSDCFG, %g2
-	st  %g2, [%g1]
-#endif
+/* Set initial FP based on CPU index */
+	mov %asr17, %g3
+	srl %g3, 28, %g3        ! Processor index
+	andcc %g3, 0x0f, %g3
 
-	! %g3 = cpu index
 1:	set STACKSIZE, %g2
-        mov %g0, %g1
+    mov %g0, %g1
 2:	subcc %g3, 0, %g0
 	be 3f
 	nop
 	add %g1, %g2, %g1
 	ba 2b
 	sub %g3, 1, %g3
+
+! %g1 = STACKSIZE * CPUINDEX
 
 
 3:	set RAMSTART + RAMSIZE-32, %fp
@@ -199,5 +171,10 @@ jump_to_ram:
 
 	jmp %g1
 	nop
+
+.section .rodata
+_fsrxx:
+	.word 0
+	.word 0
 
 .align	32

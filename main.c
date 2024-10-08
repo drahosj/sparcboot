@@ -100,7 +100,7 @@ int main()
 
       bios_puts("BIOS PUTS TEST\r\n");
       bios_puts("Second BIOS message\r\n");
-#if 0
+#if 1
       f1();
       bios_puts("Made it back\r\n");
 

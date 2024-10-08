@@ -3,7 +3,7 @@ __DYNAMIC  =  0;
 
 /* Absolutely minimal linker script for PROM support
  * 
- * Only links .text section.
+ * Only links .text/.rodata section.
  *
  * Prom is expected to perform IU initialization
  * and then jump to RAM.
@@ -18,9 +18,14 @@ SECTIONS
 {
   .text :
   {
-    text_start = .;
     _text_start = .;
     *(.text)
+    . = ALIGN (16);
+  } > rom
+  .rodata :
+  {
+    _rodata_start = .;
+    *(.rodata)
     . = ALIGN (16);
   } > rom
 }

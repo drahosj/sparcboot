@@ -31,8 +31,8 @@ usercode.elf: $(USERCODE_OBJECTS) linkuser0
 usercode.bin: usercode.elf
 	$(PREFIX)-objcopy -O binary usercode.elf usercode.bin
 
-prom.elf: prom.o linkprom
-	$(LD) -T linkprom prom.o -o prom.elf
+prom.elf: prom-minimal.o linkprom-minimal
+	$(LD) -T linkprom-minimal prom-minimal.o -o prom.elf
 
 sim: sim/build
 
