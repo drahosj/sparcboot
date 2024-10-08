@@ -59,8 +59,11 @@ if ARGV[0] == 'build'
       
       path = File.join(ENV[prefix], path) if prefix
       path = './' if path.nil?
+      
+      libfiles = lib['files']
+      libfiles = [] if libfiles.nil?
 
-      files += lib['files'].map{|f| File.join path, f}
+      files += libfiles.map{|f| File.join path, f}
     end
 
     args = ghdl_import_args.clone
