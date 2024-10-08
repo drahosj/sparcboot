@@ -14,7 +14,7 @@ OBJECTS=uart.o bios_uart.o trap.o startup.o main.o window.o bios.o xmodem.o \
 
 USERCODE_OBJECTS=usermain.o muldiv.o
 
-default: bootram.elf usercode.bin sim/rom.srec bootrom.elf
+default: bootram.elf usercode.bin sim/ram.srec bootrom.elf rom.srec
 
 sim/bootram.srec: bootram.elf
 	$(PREFIX)-objcopy -O srec -j '.text' $< $@
@@ -35,4 +35,4 @@ bootrom.elf: $(OBJECTS) linkrom
 	$(LD) -T linkrom $(OBJECTS) -L$(LIBDIR) -lc -o bootrom.elf
 
 clean:
-	rm -f *.o *.elf *.bin sim/*.srec sim/ahbrom.vhd
+	rm -f *.o *.elf *.bin
