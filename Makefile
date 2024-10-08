@@ -16,7 +16,7 @@ USERCODE_OBJECTS=usermain.o muldiv.o
 
 default: bootram.elf usercode.bin sim/ram.srec bootrom.elf rom.srec
 
-sim/bootram.srec: bootram.elf
+sim/ram.srec: bootram.elf
 	$(PREFIX)-objcopy -O srec -j '.text' $< $@
 
 rom.srec: bootrom.elf
