@@ -3,5 +3,6 @@
 *.bin
 *.swp
 sim/build
+sim/*.srec
+sim/ahbrom.vhd
 *.srec
-ahbrom.vhd
