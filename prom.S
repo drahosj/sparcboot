@@ -1,4 +1,3 @@
-
 /* Template boot-code for LEON3 test benches */
 
 #include "prom.h"
@@ -190,7 +189,7 @@ _fsrxx:
 	sub %g3, 1, %g3
 
 
-3:	set RAMSTART+ RAMSIZE-32, %fp
+3:	set RAMSTART + RAMSIZE-32, %fp
 	sub %fp, %g1, %fp
 	sub %fp, 96, %sp
 
