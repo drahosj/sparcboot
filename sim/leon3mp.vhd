@@ -165,7 +165,8 @@ begin
   -- LEON3 processor
   u0 : leon3s
     generic map (hindex=>0, fabtech=>fabtech, memtech=>memtech, dsu=>1, fpu=>0, v8=>2,
-                 mac=>0, isetsize=>8, dsetsize=>8,icen=>1, dcen=>1,tbuf=>2)
+                 mac=>0, isetsize=>8, dsetsize=>8,icen=>1, dcen=>1,tbuf=>2,
+                 rstaddr=>CFG_RSTADDR)
     port map (clkm, rstn, ahbmi, ahbmo(0), ahbsi, ahbso, irqi(0), irqo(0), dbgi(0), dbgo(0));
 
   -- LEON3 Debug Support Unit    

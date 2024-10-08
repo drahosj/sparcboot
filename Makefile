@@ -14,12 +14,12 @@ OBJECTS=uart.o bios_uart.o trap.o startup.o main.o window.o bios.o xmodem.o \
 
 USERCODE_OBJECTS=usermain.o muldiv.o
 
-default: bootram.elf usercode.bin sim/ram.srec bootrom.elf rom.srec
+default: bootram.elf usercode.bin prom.elf
 
 sim/ram.srec: bootram.elf
 	$(PREFIX)-objcopy -O srec -j '.text' $< $@
 
-rom.srec: bootrom.elf
+prom.srec: prom.elf
 	$(PREFIX)-objcopy -O srec -j '.text' $< $@
 
 bootram.elf: $(OBJECTS) linkram
@@ -31,8 +31,20 @@ usercode.elf: $(USERCODE_OBJECTS) linkuser0
 usercode.bin: usercode.elf
 	$(PREFIX)-objcopy -O binary usercode.elf usercode.bin
 
-bootrom.elf: $(OBJECTS) linkrom
-	$(LD) -T linkrom $(OBJECTS) -L$(LIBDIR) -lc -o bootrom.elf
+prom.elf: prom.o linkprom
+	$(LD) -T linkprom prom.o -o prom.elf
+
+sim: sim/build
+
+sim/build: sim/ram.srec sim/ahbrom.vhd
+	cd sim && ruby build.rb build
+
+run: sim/build
+	cd sim && ruby build.rb run
+
+sim/ahbrom.vhd: prom.srec ahbrom.vhd.erb
+	erb ahbrom.vhd.erb > sim/ahbrom.vhd
 
 clean:
-	rm -f *.o *.elf *.bin
+	rm -f *.o *.elf *.bin *.srec sim/*.srec sim/ahbrom.vhd
+	cd sim && rm -rf build

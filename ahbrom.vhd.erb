@@ -79,7 +79,7 @@ begin
   comb : process (addr)
   begin
     case conv_integer(addr) is
-        <% IO.readlines("rom.srec").each do |l|
+        <% IO.readlines("prom.srec").each do |l|
            s = l[0..1]
            next if s != "S1"
            bc = l[2..3].to_i(16)
@@ -93,7 +93,7 @@ begin
            data.each_with_index do |d, i|
              a = sprintf("%05X", baseaddr + i)
         %>
-      when 16#<%= a %># => romdata <= X"<%= d %>"; <% end
+    when 16#<%= a %># => romdata <= X"<%= d %>";<% end
            end %>
     when others => romdata <= (others => '-');
     end case;
