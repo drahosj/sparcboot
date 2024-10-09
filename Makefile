@@ -37,6 +37,17 @@ prom.elf: prom-minimal.o linkprom-minimal
 prom-dev.elf: prom-minimal.o earlyboot.o early_uart.o linkprom-minimal
 	$(LD) -T linkprom-minimal prom-minimal.o earlyboot.o early_uart.o -o prom.elf
 
+prom-ddr2.elf: prom-minimal.o earlyboot.o early_uart.o ddr2spa.o linkprom-minimal
+	$(LD) -T linkprom-minimal prom-minimal.o earlyboot.o early_uart.o ddr2spa.o -o prom.elf
+
+prom.bin: prom.elf
+	$(PREFIX)-objcopy -O binary prom.elf prom.bin
+
+flash-image.bin: prom.bin bitfile-headerless
+	cp bitfile-headerless flash-image.bin
+	truncate -s 4M flash-image.bin
+	cat prom.bin >> flash-image.bin
+
 sim: sim/build
 
 sim/build: sim/ram.srec sim/ahbrom.vhd

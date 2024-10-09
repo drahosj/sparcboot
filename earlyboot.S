@@ -28,6 +28,9 @@ _startup:
     set     hellostr, %o0
     call    early_uart_puts
     nop
+
+    call    configure_ddr2
+    nop
     
     set     0x15, %o0
     call    early_uart_puthexb
