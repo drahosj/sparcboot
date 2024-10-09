@@ -1,20 +1,5 @@
 #include "uart_registers.h"
 
-.section .text
-.global early_uart_init
-early_uart_init:
-    set     UART_BASE, %o0
-    st      %g0, [%o0 + UART_CONTROL_OFFSET]
-    st      %g0, [%o0 + UART_STATUS_OFFSET]
-    
-    set     911, %o1
-    st      %o1, [%o0 + UART_SCALER_OFFSET]
-    set     (UART_CONTROL_ENABLE_TX | UART_CONTROL_ENABLE_RX), %o1
-    st      %o1, [%o0 + UART_CONTROL_OFFSET]
-    retl
-    nop
-    nop
-
     .seg "text"
     .global bios_uart_puts
 bios_uart_puts:

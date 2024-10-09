@@ -17,10 +17,10 @@ USERCODE_OBJECTS=usermain.o muldiv.o
 default: bootram.elf usercode.bin prom.elf
 
 sim/ram.srec: bootram.elf
-	$(PREFIX)-objcopy -O srec -j '.text' -j '.rodata' $< $@
+	$(PREFIX)-objcopy -O srec -j '.text' $< $@
 
 prom.srec: prom.elf
-	$(PREFIX)-objcopy -O srec -j '.text' -j '.rodata' $< $@
+	$(PREFIX)-objcopy -O srec -j '.text' $< $@
 
 bootram.elf: $(OBJECTS) linkram
 	$(LD) -T linkram $(OBJECTS) -L$(LIBDIR) -lc -o bootram.elf
@@ -32,10 +32,7 @@ usercode.bin: usercode.elf
 	$(PREFIX)-objcopy -O binary usercode.elf usercode.bin
 
 prom.elf: prom-minimal.o linkprom-minimal
-	$(LD) -T linkprom-minimal --defsym _startup=_LINKSCRIPT_RAM_START prom-minimal.o -o prom.elf
-
-prom-dev.elf: prom-minimal.o earlyboot.o bios_uart.o linkprom-minimal
-	$(LD) -T linkprom-minimal prom-minimal.o earlyboot.o bios_uart.o -o prom.elf
+	$(LD) -T linkprom-minimal prom-minimal.o -o prom.elf
 
 sim: sim/build
 

@@ -237,20 +237,7 @@ begin
   brom : entity work.ahbrom
     generic map (hindex => 6, haddr => CFG_AHBRODDR, pipe => CFG_AHBROPIP)
     port map ( rstn, clkm, ahbsi, ahbso(6));
-
------------------------------------------------------------------------
----  AHB RAM ----------------------------------------------------------
------------------------------------------------------------------------
-
-  ahbramgen : if CFG_AHBRAMEN = 1 generate
-    ahbram0 : ahbram
-      generic map (hindex => 3, haddr => CFG_AHBRADDR, tech => CFG_MEMTECH,
-                   kbytes => CFG_AHBRSZ, pipe => CFG_AHBRPIPE)
-      port map (rstn, clkm, ahbsi, ahbso(3));
-  end generate;
-  nram : if CFG_AHBRAMEN = 0 generate ahbso(3) <= ahbs_none; end generate;
-
-
+  
 ----------------------------------------------------------------------
 ---  APB Bridge and various periherals -------------------------------
 ----------------------------------------------------------------------
