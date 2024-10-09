@@ -1,4 +1,3 @@
-.extern early_uart_puts
 
 .section .rodata
 hellostr:
@@ -11,27 +10,83 @@ secondstring:
 _startup:
     call    early_uart_init
     nop
-    nop
-    set     'B', %o1
+    
+    set     'B', %o0
     call    early_uart_putc
     nop
-    nop
-    set     '\r', %o1
+    
+    set     '\r', %o0
     call    early_uart_putc
     nop
-    nop
-    set     '\n', %o1
+    
+    set     '\n', %o0
     call    early_uart_putc
     nop
-    nop
+    
     set     hellostr, %o0
     call    early_uart_puts
     nop
+    /*
+    
+    set     0x15, %o0
+    call    early_uart_puthexb
     nop
+    
+    call    early_uart_puthexb
+    set     0xde, %o0
+    
+    set     '\r', %o0
+    call    early_uart_putc
     nop
+    set     '\n', %o0
+    call    early_uart_putc
+    nop
+    
+    
+    set     0x13247680, %o0
+    call    early_uart_puthexw
+    nop
+    
+    call    early_uart_putc
+    add     %g0, '\r', %o0
+    call    early_uart_putc
+    add     %g0, '\n', %o0
+    nop
+    
+    set     0xdeadbeef, %o0
+    call    early_uart_puthexw
+    nop
+    
+    call    early_uart_putc
+    add     %g0, '\r', %o0
+    call    early_uart_putc
+    add     %g0, '\n', %o0
+    nop
+    
+    set     hellostr, %o0
+    call    early_uart_puts
+    nop
+    
+    set     '\r', %o0
+    call    early_uart_putc
+    nop
+    set     '\n', %o0
+    call    early_uart_putc
+    nop
+    */
+    call    early_uart_puthexw
+    mov     %fp, %o0
+    
+    call    early_uart_putc
+    or      %g0, '\r', %o0
+    call    early_uart_putc
+    or      %g0, '\n', %o0
     
     set     _LINKSCRIPT_DDR2_START, %l0
     jmp     %l0
+    nop
+    nop
+    nop
     nop
     nop
 loop:
@@ -39,6 +94,7 @@ loop:
     nop
     nop
 
+    /*
 strcpy:
     ld      [%o1], %o2
     tst     %o2
@@ -50,3 +106,4 @@ strcpy:
 strcpy_done:
     retl
     nop
+    */

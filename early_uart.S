@@ -14,7 +14,68 @@ early_uart_init:
     retl
     nop
     nop
+    
 
+.global early_uart_puthexb
+early_uart_puthexb:
+    save
+    srl     %i0, 4, %o0
+    and     %o0, 0xf, %o0
+    subcc   %o0, 10, %g0
+    bl      1f
+    nop
+    add     %o0, 7, %o0
+1: 
+    call    early_uart_putc
+    add     %o0, 0x30, %o0
+    
+    and     %i0, 0xf, %o0
+    subcc   %o0, 10, %g0
+    bl      1f
+    nop
+    add     %o0, 7, %o0
+1: 
+    call    early_uart_putc
+    add     %o0, 0x30, %o0
+    restore
+    retl
+    nop
+    
+.global early_uart_puthexw
+early_uart_puthexw:
+    save
+    call    early_uart_puthexb
+    srl     %i0, 24, %o0
+    
+    call    early_uart_puthexb
+    srl     %i0, 16, %o0
+    
+    call    early_uart_puthexb
+    srl     %i0, 8, %o0
+    
+    call    early_uart_puthexb
+    mov     %i0, %o0
+    
+    restore
+    retl
+    nop
+    
+    
+
+    save
+    set     8, %l0
+puthex_dochar:
+    srl     %i0, 28, %o0
+    and     %o0, 0xf, %o0
+    or      %o0, 0x30, %o0
+    call    early_uart_putc
+    subcc   %l0, 1, %l0
+    bnz     puthex_dochar
+    sll     %i0, 4, %i0
+    restore
+    ret
+    nop
+    
     .seg "text"
     .global early_uart_puts
 early_uart_puts:
@@ -52,6 +113,8 @@ early_uart_putc:
     stub    %o0, [%o2 + UART_DATA_OFFSET]
     retl
     nop
+    
+    /*
 
     .global early_uart_getc
 early_uart_getc:
@@ -80,3 +143,4 @@ early_uart_getc_nonblock:
 1:
     retl
     nop
+*/

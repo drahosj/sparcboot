@@ -97,7 +97,7 @@ int main()
       uart_putc('!');
       uart_putc('\r');
       uart_putc('\n');
-
+      
       bios_puts("BIOS PUTS TEST\r\n");
       bios_puts("Second BIOS message\r\n");
 #if 1
