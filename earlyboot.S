@@ -2,9 +2,11 @@
 .section .rodata
 hellostr:
     .string "Hello, world (EARLY BOOT VERSION)\r\n"
-secondstring:
+secondstr:
     .string "Copied to stack (if stack works...)\r\n"
-
+crlf:
+    .string "\r\n"
+    
 .section .text
 .global _startup
 _startup:
@@ -26,7 +28,6 @@ _startup:
     set     hellostr, %o0
     call    early_uart_puts
     nop
-    /*
     
     set     0x15, %o0
     call    early_uart_puthexb
@@ -35,52 +36,35 @@ _startup:
     call    early_uart_puthexb
     set     0xde, %o0
     
-    set     '\r', %o0
-    call    early_uart_putc
+    set     crlf, %o0
+    call    early_uart_puts
     nop
-    set     '\n', %o0
-    call    early_uart_putc
-    nop
-    
     
     set     0x13247680, %o0
     call    early_uart_puthexw
     nop
     
-    call    early_uart_putc
-    add     %g0, '\r', %o0
-    call    early_uart_putc
-    add     %g0, '\n', %o0
+    set     crlf, %o0
+    call    early_uart_puts
     nop
     
     set     0xdeadbeef, %o0
     call    early_uart_puthexw
     nop
     
-    call    early_uart_putc
-    add     %g0, '\r', %o0
-    call    early_uart_putc
-    add     %g0, '\n', %o0
-    nop
-    
-    set     hellostr, %o0
+    set     crlf, %o0
     call    early_uart_puts
     nop
     
-    set     '\r', %o0
-    call    early_uart_putc
-    nop
-    set     '\n', %o0
-    call    early_uart_putc
-    nop
-    */
     call    early_uart_puthexw
     mov     %fp, %o0
     
-    call    early_uart_putc
-    or      %g0, '\r', %o0
-    call    early_uart_putc
-    or      %g0, '\n', %o0
+    
+    set     crlf, %o0
+    call    early_uart_puts
+    nop
+    
+    set     secondstr, %o1
     
     set     _LINKSCRIPT_DDR2_START, %l0
     jmp     %l0
@@ -94,7 +78,6 @@ loop:
     nop
     nop
 
-    /*
 strcpy:
     ld      [%o1], %o2
     tst     %o2
@@ -106,4 +89,3 @@ strcpy:
 strcpy_done:
     retl
     nop
-    */

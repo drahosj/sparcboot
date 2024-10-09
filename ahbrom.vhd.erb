@@ -32,8 +32,9 @@ entity ahbrom is
 end;
 
 architecture rtl of ahbrom is
-constant abits : integer := 10;
-constant bytes : integer := 560;
+-- TODO This is currently a guess instead of dynamically calculated
+constant abits : integer := <%=16%>;
+constant bytes : integer := <%=2 ** (16 - 2)%>;
 
 constant hconfig : ahb_config_type := (
   0 => ahb_device_reg ( VENDOR_GAISLER, GAISLER_AHBROM, 0, 0, 0),
