@@ -10,7 +10,7 @@ CFLAGS=-g -mcpu=v8
 ASFLAGS=-g
 
 BOOTRAM_OBJECTS=uart.o early_uart.o trap.o main.o window.o xmodem.o \
-		muldiv.o shell.o mmus.o mmu.o prom-minimal.o earlyboot.o ddr2spa.o
+		muldiv.o shell.o mmus.o mmu.o bootram_startup.o
 
 USERCODE_OBJECTS=usermain.o muldiv.o
 

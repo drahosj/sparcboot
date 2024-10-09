@@ -51,8 +51,8 @@ SECTIONS
     _bss_start = .;
     *(.bss)
     . = ALIGN (16);
-    _bss_end = .;
   } > ram
   . = ALIGN (4096);
+  _bss_end = .;
   _pt_start = .;
 }

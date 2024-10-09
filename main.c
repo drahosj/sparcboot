@@ -180,6 +180,4 @@ int main()
       shell_entry();
       early_uart_puts("somehow shell returned\n");
       */
-
-      for(;;);
 }

@@ -188,7 +188,7 @@ int register_command(struct command * new)
 
 void shell_entry()
 {
-      early_uart_puts("Bootloader entry");
+      early_uart_puts("Bootloader entry\n\n");
       register_command(&cmd_help);
       register_command(&cmd_xrecv);
       register_command(&cmd_go);

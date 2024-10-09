@@ -40,7 +40,8 @@ int uart_readline(char * buf, int len)
             if (c == '\b') {
                   i -= 2;
             }
-	} while ((c != '\n') && (i < len));
+	} while ((c != '\n') && (c != '\r') && (i < len));
+      early_uart_putc('\n');
 	buf[i - 1] = '\0';
       return i;
 }
