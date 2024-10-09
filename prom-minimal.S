@@ -161,13 +161,13 @@ start:
 ! %g1 = STACKSIZE * CPUINDEX
 
 
-3:	set RAMSTART + RAMSIZE-32, %fp
+3:	set STACKTOP-32, %fp
 	sub %fp, %g1, %fp
 	sub %fp, 96, %sp
 
-.global jump_to_ram
-jump_to_ram:
-	set RAMSTART, %g1
+.global jump_to_startup
+jump_to_startup:
+	set _startup, %g1
 
 	jmp %g1
 	nop
