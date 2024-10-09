@@ -1,11 +1,13 @@
 #include "uart.h"
 #include "early_uart.h"
-//#include "shell.h"
+#include "shell.h"
+#include "xmodem.h"
 
 #include <string.h>
 #include <stdlib.h>
 
-extern int xmodem_recv(unsigned int addr);
+extern int xmodem_recv(void *);
+extern unsigned int _LINKSCRIPT_RAM_START;
 
 void f9() { early_uart_puts("Made it to 9\r\n"); }
 void f8() { f9(); early_uart_puts("f8 returning\r\n");}
@@ -160,17 +162,24 @@ int main()
       early_uart_putc('\n');
 
 #endif
-      early_uart_puts(" -- IF THIS IS THE LAST THING YOU SEE -- \r\n");
-      early_uart_puts(" it's probably because the stock sim function of apbuart\r\n");
-      early_uart_puts("handles \\n wrong and only commits the line on \\r, \r\n");
-      early_uart_puts("\n\n");
-      early_uart_puts("Been using \\r\\n until now which is weird\r\n");
-      early_uart_puts("Need to patch grlib apbuart.vhd to print on LF not CR\r\n");
+      early_uart_puts("Receiving code over xmodem to ");
+      early_uart_puthexw((unsigned int)  &_LINKSCRIPT_RAM_START);
+      early_uart_puts(" ...");
 
-      early_uart_puts("ends with just \n");
+      xmodem_recv(&_LINKSCRIPT_RAM_START);
+
+      early_uart_puts("\n\n\n");
+      early_uart_puts("Done!\n");
+      early_uart_getc();
+      early_uart_puts("Received and loaded. Ready to continue\n");
+      early_uart_getc();
+
+      early_uart_puts("Jumping to load address. Here we go!\n\n\n");
+      /*
       early_uart_puts("About to call shell_entry\n");
-      //shell_entry();
+      shell_entry();
       early_uart_puts("somehow shell returned\n");
+      */
 
       for(;;);
 }

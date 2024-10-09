@@ -1,167 +1,58 @@
-/*  linkcmds
- *
- *  $Id: linkcmds,v 1.8.2.1 2000/05/24 17:06:38 joel Exp $
- */
-
 OUTPUT_ARCH(sparc)
 __DYNAMIC  =  0;
 
-/*
- * The memory map looks like this:
- * +--------------------+ <- low memory
- * | .text              |
- * |        etext       |
- * |        ctor list   | the ctor and dtor lists are for
- * |        dtor list   | C++ support
- * |        _endtext    |
- * +--------------------+
- * | .data              | initialized data goes here
- * |        _sdata      |
- * |        _edata      |
- * +--------------------+
- * | .bss               |
- * |        __bss_start | start of bss, cleared by crt0
- * |        _end        | start of heap, used by sbrk()
- * +--------------------+
- * |    heap space      |
- * |        _ENDHEAP    |
- * |    stack space     | 
- * |        __stack     | top of stack
- * +--------------------+ <- high memory
+/* Absolutely minimal linker script for PROM support
+ * 
+ * Only links .text/.rodata section.
+ *
+ * Prom is expected to perform IU initialization
+ * and then jump to RAM.
  */
-
-
-/* Default values, can be overridden */
-
-_RAM_SIZE = 128M;
-
-_RAM_START = 0x40000000;
-_RAM_END = _RAM_START + _RAM_SIZE;
-
-/*
- *  Alternate names without leading _.
- */
-
-RAM_START = _RAM_START;
-RAM_SIZE = _RAM_SIZE;
-RAM_END = _RAM_END;
-
-_LEON_REG = 0x80000000;
-LEON_REG = 0x80000000;
-
-/* these are the maximum values */
 
 MEMORY
 {
+  rom     : ORIGIN = 0x00000000, LENGTH = 12M
   ram     : ORIGIN = 0x40000000, LENGTH = 128M
 }
+
+/* Assume some ram exists and yolo */
+_LINKSCRIPT_DDR2_START = 0x40000000;
+_LINKSCRIPT_DDR2_END = 0x48000000;
+
+/* Use DDR2 */
+_LINKSCRIPT_RAM_START = _LINKSCRIPT_DDR2_START;
+_LINKSCRIPT_RAM_END = _LINKSCRIPT_DDR2_END;
 
 SECTIONS
 {
   .text :
   {
-    /* Begin with trap table at entry address */
-    TRAP_TABLE_START = .;
-    *(.text.tt);
-    . = ALIGN(0x1000);
-    BIOS_TABLE_START = .;
-    *(.text.bios);
-    . = ALIGN(0x1000);
-    _pt_start = .;
-    . += 0x4000;
-    _pt_end = .;
-
-    CREATE_OBJECT_SYMBOLS
-    text_start = .;
+    _trap_table_start = .;
+    *(.text.tt)
+    . = ALIGN (4096);
     _text_start = .;
     *(.text)
     . = ALIGN (16);
-
-    *(.eh_frame)
-    . = ALIGN (16);
-
-    *(.gnu.linkonce.t*)
-
-    /*
-     * C++ constructors
-     */
-    __CTOR_LIST__ = .;
-    LONG((__CTOR_END__ - __CTOR_LIST__) / 4 - 2)
-    *(.ctors)
-    LONG(0)
-    __CTOR_END__ = .;
-    __DTOR_LIST__ = .;
-    LONG((__DTOR_END__ - __DTOR_LIST__) / 4 - 2)
-    *(.dtors)
-    LONG(0)
-    __DTOR_END__ = .;
-
-    _rodata_start = . ;
-    *(.rodata*)
-    *(.gnu.linkonce.r*)
-    _erodata = ALIGN( 0x10 ) ;
-
-    etext = ALIGN(0x10);
-    _etext = .;
-    *(.init)
-    *(.fini)
-    *(.lit)
-    *(.shdata)
-    . = ALIGN (16);
-    _endtext = .;
   } > ram
-  .dynamic	  : { *(.dynamic) 	} >ram
-  .got		  : { *(.got) 		} >ram
-  .plt   	  : { *(.plt) 		} >ram
-  .hash		  : { *(.hash)		} >ram
-  .dynrel	  : { *(.dynrel)	} >ram
-  .dynsym	  : { *(.dynsym)	} >ram
-  .dynstr	  : { *(.dynstr)	} >ram
-  .hash		  : { *(.hash)		} >ram
+  .rodata :
+  {
+    _rodata_start = .;
+    *(.rodata)
+    . = ALIGN (16);
+  } > ram
   .data :
   {
-    data_start = .;
     _data_start = .;
-    _sdata = . ;
     *(.data)
-    *(.gnu.linkonce.d*)
-    *(.gcc_except_table)
-    . = ALIGN(0x10);
-    edata = .;
-    _edata = .;
-  } > ram
-  .shbss :
-  {
-    *(.shbss)
+    . = ALIGN (16);
   } > ram
   .bss :
   {
-    __bss_start = ALIGN(0x8);
     _bss_start = .;
-    bss_start = .;
     *(.bss)
-    *(COMMON)
-    end = .;
-    _end = ALIGN(0x8);
-    __end = ALIGN(0x8);
+    . = ALIGN (16);
+    _bss_end = .;
   } > ram
-  .jcr . (NOLOAD)  : { *(.jcr) 		}
-  .stab . (NOLOAD) :
-  {
-    [ .stab ]
-  }
-  .stabstr . (NOLOAD) :
-  {
-    [ .stabstr ]
-  }
+  . = ALIGN (4096);
+  _pt_start = .;
 }
-
-bios_putc = BIOS_TABLE_START + 0x00;
-bios_puts = BIOS_TABLE_START + 0x10;
-bios_getc = BIOS_TABLE_START + 0x20;
-bios_getc_nb = BIOS_TABLE_START + 0x30;
-bios_wait = BIOS_TABLE_START + 0x40;
-
-bios_readline = BIOS_TABLE_START + 0x80;
-
-ENTRY(TRAP_TABLE_START)

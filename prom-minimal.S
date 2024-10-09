@@ -73,14 +73,11 @@ start:
 	bge 1b
 	save
 
-/*
-    Don't enable traps yet, TBR doesn't point at valid handlers
 	mov	2, %g1
 	mov	%g1, %wim
 	set 0x10e0, %g1		! enable traps
 	mov %g1, %psr
 	nop; nop; nop;
-*/
 
 	mov %psr, %g1
 	srl %g1, 12, %g1

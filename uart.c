@@ -1,6 +1,5 @@
 #include "uart.h"
-
-#include "bios.h"
+#include "early_uart.h"
 
 static inline int loadmem(int addr)
 {
@@ -35,9 +34,9 @@ int uart_readline(char * buf, int len)
       int c;
       int i = 0;
 	do {
-		c = bios_getc();
+		c = early_uart_getc();
 		buf[i++] = c & 0x7f;
-		bios_putc(c);
+		early_uart_putc(c);
             if (c == '\b') {
                   i -= 2;
             }

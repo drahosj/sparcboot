@@ -11,7 +11,7 @@ __DYNAMIC  =  0;
 
 MEMORY
 {
-  rom     : ORIGIN = 0x00000000, LENGTH = 16M
+  rom     : ORIGIN = 0x00000000, LENGTH = 12M
 }
 
 /* Assume some ram exists and yolo */

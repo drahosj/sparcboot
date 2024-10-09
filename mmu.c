@@ -3,7 +3,7 @@
 
 #include "uart_registers.h"
 
-#include "bios.h"
+#include "early_uart.h"
 #include "shell.h"
 
 #include <string.h>
@@ -27,7 +27,7 @@ extern void mmu_set_context(int ctxt);
 extern void putn(int);
 extern void puth(int);
 
-extern char _RAM_END;
+extern char _LINKSCRIPT_RAM_END;
 
 static int fn_map(void);
 
@@ -59,11 +59,11 @@ static struct command cmd_map = {
 
 static int mmu_map(int ctx, unsigned int p, unsigned int v, int verbose)
 {
-      bios_puts("Mapping V(");
+      early_uart_puts("Mapping V(");
       puth(v);
-      bios_puts(") -> P(");
+      early_uart_puts(") -> P(");
       puth(p);
-      bios_puts(")\n");
+      early_uart_puts(")\n");
       unsigned int i1 = (v >> 24) & 0xff;
       unsigned int i2 = (v >> 18) & 0x3f;
       unsigned int i3 = (v >> 12) & 0x3f;
@@ -76,7 +76,7 @@ static int mmu_map(int ctx, unsigned int p, unsigned int v, int verbose)
 
       if (l1tbl == NULL) {
             if (verbose) {
-                  bios_puts("Allocating new L1 table\n");
+                  early_uart_puts("Allocating new L1 table\n");
             }
             l1tbl = next_free_l1;
             next_free_l1 += 1024;
@@ -84,18 +84,18 @@ static int mmu_map(int ctx, unsigned int p, unsigned int v, int verbose)
             memset(l1tbl, 0, MMU_L1_TBLSIZE);
       }
       if (verbose) {
-            bios_puts("L1 table: ");
+            early_uart_puts("L1 table: ");
             puth((unsigned int) l1tbl);
-            bios_puts("\nL1 index: ");
+            early_uart_puts("\nL1 index: ");
             puth(i1);
-            bios_putc('\n');
+            early_uart_putc('\n');
       }
 
       struct mmu_ptd * l2tbl = (struct mmu_ptd *) 
             ((l1tbl[i1].ptv & (~0x3)) << 4);
       if (l2tbl == NULL) {
             if (verbose) {
-                  bios_puts("Allocating L2 table\n");
+                  early_uart_puts("Allocating L2 table\n");
             }
             l2tbl = next_free_l23;
             next_free_l23 += 64;
@@ -103,18 +103,18 @@ static int mmu_map(int ctx, unsigned int p, unsigned int v, int verbose)
             memset(l2tbl, 0, MMU_L23_TBLSIZE);
       }
       if (verbose) {
-            bios_puts("L2 table: ");
+            early_uart_puts("L2 table: ");
             puth((unsigned int) l2tbl);
-            bios_puts("\nL2 index: ");
+            early_uart_puts("\nL2 index: ");
             puth(i2);
-            bios_putc('\n');
+            early_uart_putc('\n');
       }
 
       struct mmu_ptd * l3tbl = (struct mmu_ptd *) 
             ((l2tbl[i2].ptv & (~0x3)) << 4);
       if (l3tbl == NULL) {
             if (verbose) {
-                  bios_puts("Allocating L3 table\n");
+                  early_uart_puts("Allocating L3 table\n");
             }
             l3tbl = next_free_l23;
             next_free_l23 += 64;
@@ -122,13 +122,13 @@ static int mmu_map(int ctx, unsigned int p, unsigned int v, int verbose)
             memset(l3tbl, 0, MMU_L23_TBLSIZE);
       }
       if (verbose) {
-            bios_puts("L3 table: ");
+            early_uart_puts("L3 table: ");
             puth((unsigned int) l3tbl);
-            bios_puts("\nL3 index: ");
+            early_uart_puts("\nL3 index: ");
             puth(i3);
-            bios_puts("\nPTE value: ");
+            early_uart_puts("\nPTE value: ");
             puth(pte);
-            bios_putc('\n');
+            early_uart_putc('\n');
       }
 
       l3tbl[i3].pte = pte;
@@ -163,15 +163,15 @@ int mmu_init_layout()
       next_free_l1 = l1tables;
       next_free_l23 = l23tables;
 
-      bios_puts("Context start: ");
+      early_uart_puts("Context start: ");
       puth((unsigned int) ctx_tbl);
-      bios_putc('\n');
-      bios_puts("L1 table space: ");
+      early_uart_putc('\n');
+      early_uart_puts("L1 table space: ");
       puth((unsigned int) next_free_l1);
-      bios_putc('\n');
-      bios_puts("L23 table space: ");
+      early_uart_putc('\n');
+      early_uart_puts("L23 table space: ");
       puth((unsigned int) next_free_l23);
-      bios_putc('\n');
+      early_uart_putc('\n');
 
 
       /* Map beginning of RAM at its actual address */
@@ -181,7 +181,7 @@ int mmu_init_layout()
 
       /* And map end of ram for stack pointer purposes */
       for (int i = 1; i < 5; i += 1) {
-            unsigned int sp_top = (unsigned int) &_RAM_END;
+            unsigned int sp_top = (unsigned int) &_LINKSCRIPT_RAM_END;
             mmu_map(0, sp_top -  (i << 12), sp_top - (i << 12), verbose);
       }
 
@@ -231,11 +231,11 @@ static int print_l3_table(unsigned int ptd, unsigned int prefix)
             if (tbl[i] != 0) {
                   unsigned int ppn = (tbl[i] & (~0xff)) << 4;
                   unsigned int va = prefix | (i << 12);
-                  bios_putc('\t');
+                  early_uart_putc('\t');
                   puth(va);
-                  bios_puts(" -> ");
+                  early_uart_puts(" -> ");
                   puth(ppn);
-                  bios_putc('\n');
+                  early_uart_putc('\n');
             }
       }
 }
@@ -254,7 +254,7 @@ static int fn_print_table()
 {
 
       if (ctx_tbl == NULL) {
-            bios_puts("Context table pointer is null\n");
+            early_uart_puts("Context table pointer is null\n");
             return -1;
       }
 
@@ -263,7 +263,7 @@ static int fn_print_table()
       unsigned int * l1tbl = PTD_TO_PTR(ctx_tbl[ctx].ptv);
 
       if (l1tbl == NULL) {
-            bios_puts("Root pointer is null\n");
+            early_uart_puts("Root pointer is null\n");
             return -1;
       }
       for (int i = 0; i < MMU_L1_NENTS; i++) {

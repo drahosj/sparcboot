@@ -9,8 +9,8 @@ LIBDIR=$(HOME)/cross/$(PREFIX)/lib
 CFLAGS=-g -mcpu=v8
 ASFLAGS=-g
 
-OBJECTS=uart.o bios_uart.o trap.o startup.o main.o window.o bios.o xmodem.o \
-		muldiv.o shell.o mmus.o mmu.o
+BOOTRAM_OBJECTS=uart.o early_uart.o trap.o main.o window.o xmodem.o \
+		muldiv.o shell.o mmus.o mmu.o prom-minimal.o earlyboot.o ddr2spa.o
 
 USERCODE_OBJECTS=usermain.o muldiv.o
 
@@ -19,11 +19,14 @@ default: prom.elf
 sim/ram.srec: bootram.elf
 	$(PREFIX)-objcopy -O srec -j '.text*' -j '.rodata*' $< $@
 
+bootram.bin: bootram.elf
+	$(PREFIX)-objcopy -O binary  $< $@
+
 prom.srec: prom.elf
 	$(PREFIX)-objcopy -O srec -j '.text*' -j '.rodata*' $< $@
 
-bootram.elf: $(OBJECTS) linkram
-	$(LD) -T linkram $(OBJECTS) -L$(LIBDIR) -lc -o bootram.elf
+bootram.elf: $(BOOTRAM_OBJECTS) linkram
+	$(LD) -T linkram $(BOOTRAM_OBJECTS) -L$(LIBDIR) -lc -o bootram.elf
 
 usercode.elf: $(USERCODE_OBJECTS) linkuser0
 	$(LD) -T linkuser0 $(USERCODE_OBJECTS) -L$(LIBDIR) -lc -o usercode.elf
@@ -38,7 +41,8 @@ prom-dev: prom-minimal.o earlyboot.o early_uart.o linkprom-minimal
 	$(LD) -T linkprom-minimal prom-minimal.o earlyboot.o early_uart.o -o prom.elf
 
 DDR2PROM_OBJECTS=prom-minimal.o earlyboot.o early_uart.o ddr2spa.o \
-				 trap.o window.o main.o muldiv.o
+				 trap.o window.o main.o muldiv.o xmodem.o	\
+				 uart.o
 
 prom-ddr2: $(DDR2PROM_OBJECTS) linkprom
 	$(LD) -T linkprom $(DDR2PROM_OBJECTS) -o prom.elf -L$(LIBDIR) -lc

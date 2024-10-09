@@ -1,9 +1,9 @@
 #include "xmodem.h"
 
     .section ".text"
-.extern bios_putc
-.extern bios_getc
-.extern bios_getc_nb
+.extern early_uart_putc
+.extern early_uart_getc
+.extern early_uart_getc_nonblock
 
     .global xmodem_recv
 xmodem_recv:
@@ -12,11 +12,11 @@ xmodem_recv:
     set     1, %l0
 
 sync:
-    call    bios_putc
+    call    early_uart_putc
     set     NAK, %o0
     set     500000, %l1
 check:
-    call    bios_getc_nb
+    call    early_uart_getc_nonblock
     nop
     cmp     %o0, 0
     bg      sync_enter
@@ -30,7 +30,7 @@ check:
     nop
 
 begin_block:
-    call    bios_getc
+    call    early_uart_getc
     set     0, %l7
 
 sync_enter:
@@ -43,10 +43,10 @@ sync_enter:
     bne,a   end
     set     -ENOSOH, %i0
 
-    call    bios_getc
+    call    early_uart_getc
     nop
     mov     %o0, %l1
-    call    bios_getc
+    call    early_uart_getc
     nop
     add     %o0, %l1, %o0
     cmp     %o0, 0xff
@@ -59,7 +59,7 @@ sync_enter:
 
     set     0, %l2
 recv_data:
-    call    bios_getc
+    call    early_uart_getc
     nop
     stub    %o0, [%i0 + %l2]
     inc     %l2
@@ -67,7 +67,7 @@ recv_data:
     bl      recv_data
     nop
 
-    call    bios_getc
+    call    early_uart_getc
     nop
     /* ignore checksum */
 
@@ -77,21 +77,21 @@ recv_data:
 
     add     %i0, %l2, %i0
     inc     %l0
-    call    bios_putc
+    call    early_uart_putc
     set     ACK, %o0
     ba      begin_block
 
 nack_block:
-    call    bios_putc
+    call    early_uart_putc
     set     NAK, %o0
     ba      begin_block
     
 begin_exit:
-    call bios_putc
+    call early_uart_putc
     set     ACK, %o0
 
 #ifdef EXPECT_ETB
-    call bios_getc
+    call early_uart_getc
     nop
     
     cmp     %o0, ETB
@@ -100,12 +100,12 @@ begin_exit:
 #endif
 
     sub     %i0, %i1, %i0
-    call    bios_putc
+    call    early_uart_putc
     set     ACK, %o0
     ba      end
     nop
 1:
-    call    bios_putc
+    call    early_uart_putc
     set     NAK, %o0
 end:
     ret     

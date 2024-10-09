@@ -1,5 +1,6 @@
 #include "shell.h"
 #include "early_uart.h"
+#include "uart.h"
 #include "mmu.h"
 
 #include <string.h>
@@ -61,15 +62,15 @@ static int fn_help()
 {
       struct command * cmd = command_head;
       while (cmd != NULL) {
-            bios_puts("\t");
-            bios_puts(cmd->name);
-            bios_puts("\t- ");
-            bios_puts(cmd->help);
-            bios_puts("\n");
+            early_uart_puts("\t");
+            early_uart_puts(cmd->name);
+            early_uart_puts("\t- ");
+            early_uart_puts(cmd->help);
+            early_uart_puts("\n");
             cmd = cmd->next;
       }
 
-      bios_puts("\n");
+      early_uart_puts("\n");
       return 0;
 }
 
@@ -87,23 +88,23 @@ static int fn_go()
       if (offset == 0) {
             struct addr_var * var = get_addr_var(offset_str);
             if (var == NULL) {
-                  bios_puts("Unable to determine offset\n");
+                  early_uart_puts("Unable to determine offset\n");
                   return -1;
             }
             offset = var->val;
       }
-      bios_puts("\nGo ");
+      early_uart_puts("\nGo ");
       putn(offset);
-      bios_putc('\n');
+      early_uart_putc('\n');
 
       if (save_shell_frame()) {
             int ret = ((int (*)(void)) offset)();
-            bios_puts("User code returned: ");
+            early_uart_puts("User code returned: ");
             putn(ret);
-            bios_putc('\n');
+            early_uart_putc('\n');
             return 0;
       } else {
-            bios_puts("Recovered from segfault\n");
+            early_uart_puts("Recovered from segfault\n");
       }
       return 0;
 }
@@ -121,25 +122,25 @@ static int fn_xrecv()
       if (offset == 0) {
             struct addr_var * var = get_addr_var(offset_str);
             if (var == NULL) {
-                  bios_puts("Unable to determine offset\n");
+                  early_uart_puts("Unable to determine offset\n");
                   return -1;
             }
             offset = var->val;
       }
-      bios_puts("Loading to offset ");
+      early_uart_puts("Loading to offset ");
       putn(offset);
-      bios_putc('\n');
+      early_uart_putc('\n');
       int ret = xmodem_recv(0x40010000);
-      bios_getc();
-      bios_putc('\n');
+      early_uart_getc();
+      early_uart_putc('\n');
       if (ret > 0) {
-            bios_puts("Received bytes: ");
+            early_uart_puts("Received bytes: ");
             putn(ret);
-            bios_putc('\n');
+            early_uart_putc('\n');
       } else {
-            bios_puts("Err: ");
+            early_uart_puts("Err: ");
             putn(ret);
-            bios_putc('\n');
+            early_uart_putc('\n');
       }
 }
 
@@ -156,7 +157,7 @@ int fn_getvar()
             return -1;
       }
       putn(val->val);
-      bios_putc('\n');
+      early_uart_putc('\n');
       return 0;
 }
 
@@ -187,7 +188,7 @@ int register_command(struct command * new)
 
 void shell_entry()
 {
-      bios_puts("Bootloader entry");
+      early_uart_puts("Bootloader entry");
       register_command(&cmd_help);
       register_command(&cmd_xrecv);
       register_command(&cmd_go);
@@ -200,15 +201,15 @@ void shell_entry()
 
       char buf[128];
       for(;;) {
-            bios_puts("BOOTLOADER> ");
-            bios_readline(buf, 128);
+            early_uart_puts("BOOTLOADER> ");
+            uart_readline(buf, 128);
 
             char * name = strtok(buf, " ");
             struct command * cmd = find_command(name);
             if (cmd != NULL) {
                   cmd->fn();
             } else {
-                  bios_puts("Invalid command\n");
+                  early_uart_puts("Invalid command\n");
             }
       }
 }
