@@ -29,8 +29,11 @@ _startup:
     call    early_uart_puts
     nop
 
+#define CONFIGURE_DDR2
+#ifdef CONFIGURE_DDR2
     call    configure_ddr2
     nop
+#endif
     
     set     0x15, %o0
     call    early_uart_puthexb

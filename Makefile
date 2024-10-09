@@ -17,10 +17,10 @@ USERCODE_OBJECTS=usermain.o muldiv.o
 default: bootram.elf usercode.bin prom.elf
 
 sim/ram.srec: bootram.elf
-	$(PREFIX)-objcopy -O srec -j '.text' -j '.rodata' $< $@
+	$(PREFIX)-objcopy -O srec -j '.text*' -j '.rodata*' $< $@
 
 prom.srec: prom.elf
-	$(PREFIX)-objcopy -O srec -j '.text' -j '.rodata' $< $@
+	$(PREFIX)-objcopy -O srec -j '.text*' -j '.rodata*' $< $@
 
 bootram.elf: $(OBJECTS) linkram
 	$(LD) -T linkram $(OBJECTS) -L$(LIBDIR) -lc -o bootram.elf
@@ -31,17 +31,22 @@ usercode.elf: $(USERCODE_OBJECTS) linkuser0
 usercode.bin: usercode.elf
 	$(PREFIX)-objcopy -O binary usercode.elf usercode.bin
 
-prom.elf: prom-minimal.o linkprom-minimal
+prom-minimal: prom-minimal.o linkprom-minimal
 	$(LD) -T linkprom-minimal prom-minimal.o --defsym _startup=_LINKSCRIPT_DDR2_START -o prom.elf
 
-prom-dev.elf: prom-minimal.o earlyboot.o early_uart.o linkprom-minimal
+prom-dev: prom-minimal.o earlyboot.o early_uart.o linkprom-minimal
 	$(LD) -T linkprom-minimal prom-minimal.o earlyboot.o early_uart.o -o prom.elf
 
-prom-ddr2.elf: prom-minimal.o earlyboot.o early_uart.o ddr2spa.o linkprom-minimal
-	$(LD) -T linkprom-minimal prom-minimal.o earlyboot.o early_uart.o ddr2spa.o -o prom.elf
+DDR2PROM_OBJECTS=prom-minimal.o earlyboot.o early_uart.o ddr2spa.o \
+				 trap.o window.o
+
+prom-ddr2: $(DDR2PROM_OBJECTS) linkprom
+	$(LD) -T linkprom $(DDR2PROM_OBJECTS) -o prom.elf
+
+prom.elf: prom-ddr2
 
 prom.bin: prom.elf
-	$(PREFIX)-objcopy -O binary prom.elf prom.bin
+	$(PREFIX)-objcopy -O binary -j '.text*' -j '.rodata*' prom.elf prom.bin
 
 flash-image.bin: prom.bin bitfile-headerless
 	cp bitfile-headerless flash-image.bin

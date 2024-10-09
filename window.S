@@ -1,6 +1,3 @@
-
-.extern bios_puts
-
     .section ".rodata"
 str_ovf_spill1: .string "Spilled ins.\r\n"
 str_ovf_spill2: .string "Spilled locals.\r\n"

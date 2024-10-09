@@ -7,6 +7,13 @@ _unimpl_trap:
     nop
     nop
 
+#define UNIMPL_TRAP()       \
+1:                          \
+    nop;                    \
+    ba  1b;                 \
+    nop;                    \
+    nop                     
+
 /* Extern'd trap handlers */
 .extern start
 .extern ovf_handler
@@ -75,19 +82,19 @@ trap_table:
 /* TT = 0x00 */
     ISR_JUMP(start)
     ISR_JUMP(segfault_handler)
-    ISR_JUMP(_unimpl_trap)
-    ISR_JUMP(_unimpl_trap)
-    ISR_JUMP(_unimpl_trap)
+    UNIMPL_TRAP()
+    UNIMPL_TRAP()
+    UNIMPL_TRAP()
     ISR_JUMP(ovf_handler)
     ISR_JUMP(unf_handler)
-    ISR_JUMP(_unimpl_trap)
+    UNIMPL_TRAP()
 
 /* TT = 0x08 */
-    ISR_JUMP(_unimpl_trap)
+    UNIMPL_TRAP()
     ISR_JUMP(segfault_handler)
-    ISR_JUMP(_unimpl_trap)
-    ISR_JUMP(_unimpl_trap)
-    ISR_JUMP(_unimpl_trap)
-    ISR_JUMP(_unimpl_trap)
-    ISR_JUMP(_unimpl_trap)
-    ISR_JUMP(_unimpl_trap)
+    UNIMPL_TRAP()
+    UNIMPL_TRAP()
+    UNIMPL_TRAP()
+    UNIMPL_TRAP()
+    UNIMPL_TRAP()
+    UNIMPL_TRAP()

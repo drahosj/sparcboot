@@ -4,7 +4,7 @@
 #define L2MCTRLIO 0x80000000
 #define IRQCTRL   0x80000200
 
-//#define STACK_IN_DDR2
+#define STACK_IN_DDR2
 
 /* Point at DDR */
 #ifdef STACK_IN_DDR2

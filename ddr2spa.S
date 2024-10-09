@@ -1,6 +1,7 @@
 #include "ddr2spa.h"
 
     .section .rodata
+.align 4
 .global ddr2cfg_values
 ddr2cfg_values:
     .word DDR2CFG1
