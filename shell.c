@@ -1,5 +1,5 @@
 #include "shell.h"
-#include "bios.h"
+#include "early_uart.h"
 #include "mmu.h"
 
 #include <string.h>

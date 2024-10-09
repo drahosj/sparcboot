@@ -77,6 +77,10 @@ _startup:
     call    early_uart_puts
     mov     %l0, %o0
     
+    call    main
+    nop
+    nop
+    
     set     _LINKSCRIPT_DDR2_START, %l0
     jmp     %l0
     nop

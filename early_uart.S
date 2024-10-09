@@ -114,7 +114,6 @@ early_uart_putc:
     retl
     nop
     
-    /*
 
     .global early_uart_getc
 early_uart_getc:
@@ -143,4 +142,3 @@ early_uart_getc_nonblock:
 1:
     retl
     nop
-*/

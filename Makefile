@@ -14,7 +14,7 @@ OBJECTS=uart.o bios_uart.o trap.o startup.o main.o window.o bios.o xmodem.o \
 
 USERCODE_OBJECTS=usermain.o muldiv.o
 
-default: bootram.elf usercode.bin prom.elf
+default: prom.elf
 
 sim/ram.srec: bootram.elf
 	$(PREFIX)-objcopy -O srec -j '.text*' -j '.rodata*' $< $@
@@ -38,10 +38,10 @@ prom-dev: prom-minimal.o earlyboot.o early_uart.o linkprom-minimal
 	$(LD) -T linkprom-minimal prom-minimal.o earlyboot.o early_uart.o -o prom.elf
 
 DDR2PROM_OBJECTS=prom-minimal.o earlyboot.o early_uart.o ddr2spa.o \
-				 trap.o window.o
+				 trap.o window.o main.o muldiv.o
 
 prom-ddr2: $(DDR2PROM_OBJECTS) linkprom
-	$(LD) -T linkprom $(DDR2PROM_OBJECTS) -o prom.elf
+	$(LD) -T linkprom $(DDR2PROM_OBJECTS) -o prom.elf -L$(LIBDIR) -lc
 
 prom.elf: prom-ddr2
 
