@@ -16,8 +16,8 @@ early_uart_init:
     nop
 
     .seg "text"
-    .global bios_uart_puts
-bios_uart_puts:
+    .global early_uart_puts
+early_uart_puts:
     set     UART_BASE, %o2
 3:
     ldub    [%o0], %o1
@@ -40,8 +40,8 @@ bios_uart_puts:
     retl
     nop
 
-    .global bios_uart_putc
-bios_uart_putc:
+    .global early_uart_putc
+early_uart_putc:
     set     UART_BASE, %o2
 
 2:
@@ -49,12 +49,12 @@ bios_uart_putc:
     andcc   %o3, UART_STATUS_TE, %g0
     bz      2b
     nop
-    stub    %o1, [%o2 + UART_DATA_OFFSET]
+    stub    %o0, [%o2 + UART_DATA_OFFSET]
     retl
     nop
 
-    .global bios_uart_getc
-bios_uart_getc:
+    .global early_uart_getc
+early_uart_getc:
     set     UART_BASE, %o2
     
 1:
@@ -66,8 +66,8 @@ bios_uart_getc:
     retl
     and     %o0, 0xff, %o0
 
-    .global bios_uart_getc_nonblock
-bios_uart_getc_nonblock:
+    .global early_uart_getc_nonblock
+early_uart_getc_nonblock:
     set     UART_BASE, %o2
     
     ld      [%o2 + UART_STATUS_OFFSET], %o3
