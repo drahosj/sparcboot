@@ -65,6 +65,11 @@ _startup:
     nop
     
     set     secondstr, %o1
+    sub     %sp, 64, %l0
+    call    strcpy
+    mov     %l0, %o0
+    call    early_uart_puts
+    mov     %l0, %o0
     
     set     _LINKSCRIPT_DDR2_START, %l0
     jmp     %l0
