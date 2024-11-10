@@ -65,6 +65,10 @@ extern int save_shell_frame(void);
 static int fn_go()
 {
       char * offset_str = strtok(NULL, " ");
+      if (offset_str == NULL) {
+            early_uart_puts("go <offset>\n");
+            return -1;
+      }
       unsigned long offset = strtol(offset_str, NULL, 0);
       if (offset == 0) {
             struct addr_var * var = get_addr_var(offset_str);
@@ -99,6 +103,10 @@ static struct command cmd_go = {
 static int fn_xrecv()
 {
       char * offset_str = strtok(NULL, " ");
+      if (offset_str == NULL) {
+            early_uart_puts("xrecv <offset>\n");
+            return -1;
+      }
       unsigned long offset = strtol(offset_str, NULL, 0);
       if (offset == 0) {
             struct addr_var * var = get_addr_var(offset_str);
@@ -133,7 +141,11 @@ static struct command cmd_xrecv = {
 
 int fn_getvar()
 {
-      struct addr_var * val = get_addr_var(strtok(NULL, " "));
+      char * varname = strtok(NULL, " ");
+      if (varname == NULL) {
+            return -1;
+      }
+      struct addr_var * val = get_addr_var(varname);
       if (val == NULL) {
             return -1;
       }
@@ -177,6 +189,9 @@ void shell_entry()
             uart_readline(buf, 128);
 
             char * name = strtok(buf, " ");
+            if (name == NULL) {
+                  continue;
+            }
             struct command * cmd = find_command(name);
             if (cmd != NULL) {
                   cmd->fn();

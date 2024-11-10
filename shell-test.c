@@ -11,7 +11,7 @@ int main()
 
 void xmodem_recv()
 {
-      printf("Unimplemented xmodem function called");
+      puts("Unimplemented xmodem function called");
 }
 
 void early_uart_puts(char * s)
