@@ -2,6 +2,7 @@
 #include "early_uart.h"
 #include "uart.h"
 #include "mmu.h"
+#include "list.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -9,49 +10,29 @@
 extern void putn(int n);
 extern long xmodem_recv(unsigned long addr);
 
-static struct list ** get_tail(struct list ** head)
-{
-      if (*head == NULL) {
-            return head;
-      }
-      struct list * cursor = *head;
-
-      while (cursor->next != NULL) {
-            cursor = cursor->next;
-      }
-      return &(cursor->next);
-}
-
-static struct command * command_head;
-static struct addr_var * addr_head;
+static struct list commands;
+static struct list addr_vars;
 
 struct addr_var * get_addr_var(char * name)
 {
-      struct addr_var * var = addr_head;
+      struct addr_var * var = (struct addr_var *) addr_vars.next;
       while (var != NULL) {
             if (!strcmp(var->name, name)) {
                   return var;
             }
-            var = var->next;
+            var = (struct addr_var *) var->list.next;
       }
       return 0;
 }
 
-int set_addr_var(struct addr_var * var)
-{
-      struct list ** tail = get_tail((struct list **) &addr_head);
-      *tail = (struct list *) var;
-      return 0;
-}
-      
 static struct command * find_command(char * name)
 {
-      struct command * cmd = command_head;
+      struct command * cmd = (struct command *) commands.next;
       while (cmd != NULL) {
             if (!strcmp(name, cmd->name)) {
                   break;
             }
-            cmd = cmd->next;
+            cmd = (struct command *) cmd->list.next;
       }
       return cmd;
 }
@@ -60,14 +41,14 @@ static struct addr_var var_buffer[32];
 
 static int fn_help()
 {
-      struct command * cmd = command_head;
+      struct command * cmd = (struct command *) commands.next;
       while (cmd != NULL) {
             early_uart_puts("\t");
             early_uart_puts(cmd->name);
             early_uart_puts("\t- ");
             early_uart_puts(cmd->help);
             early_uart_puts("\n");
-            cmd = cmd->next;
+            cmd = (struct command *) cmd->list.next;
       }
 
       early_uart_puts("\n");
@@ -177,27 +158,18 @@ static struct addr_var ramboot_var = {
       .val = 0x40000000
 };
 
-int register_command(struct command * new)
-{
-      struct list ** tail = get_tail((struct list **) &command_head);
-
-      *tail = (struct list *) new;
-
-      return 0;
-}
-
 void shell_entry()
 {
       early_uart_puts("Bootloader entry\n\n");
-      register_command(&cmd_help);
-      register_command(&cmd_xrecv);
-      register_command(&cmd_go);
-      register_command(&cmd_getvar);
+      list_append(&commands, (struct list *) &cmd_help);
+      list_append(&commands, (struct list *) &cmd_xrecv);
+      list_append(&commands, (struct list *) &cmd_go);
+      list_append(&commands, (struct list *) &cmd_getvar);
 
       register_mmu_commands();
 
-      set_addr_var(&defuser_var);
-      set_addr_var(&ramboot_var);
+      list_append(&addr_vars, (struct list *) &defuser_var);
+      list_append(&addr_vars, (struct list *) &ramboot_var);
 
       char buf[128];
       for(;;) {
