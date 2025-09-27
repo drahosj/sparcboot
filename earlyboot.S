@@ -29,7 +29,7 @@ _startup:
     call    early_uart_puts
     nop
 
-#define CONFIGURE_DDR2
+//#define CONFIGURE_DDR2
 #ifdef CONFIGURE_DDR2
     call    configure_ddr2
     nop

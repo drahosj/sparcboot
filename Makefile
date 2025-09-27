@@ -47,7 +47,10 @@ DDR2PROM_OBJECTS=prom-minimal.o earlyboot.o early_uart.o ddr2spa.o \
 prom-ddr2: $(DDR2PROM_OBJECTS) linkprom
 	$(LD) -T linkprom $(DDR2PROM_OBJECTS) -o prom.elf -L$(LIBDIR) -lc
 
-prom.elf: prom-ddr2
+prom-sim: $(DDR2PROM_OBJECTS) linkprom
+	$(LD) -T linkprom-sim $(DDR2PROM_OBJECTS) -o prom.elf -L$(LIBDIR) -lc
+
+prom.elf: prom-sim
 
 prom.bin: prom.elf
 	$(PREFIX)-objcopy -O binary -j '.text*' -j '.rodata*' prom.elf prom.bin
