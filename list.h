@@ -5,6 +5,6 @@ struct list {
     struct list * next;
 };
 
-void list_append(struct list * head, struct list * item);
+int list_append(struct list * head, struct list * item);
 
 #endif

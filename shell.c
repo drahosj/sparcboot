@@ -200,3 +200,8 @@ void shell_entry()
             }
       }
 }
+
+int register_command(struct command *cmd) 
+{
+      return list_append(&commands, (struct list *) cmd);
+}

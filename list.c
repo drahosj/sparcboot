@@ -5,7 +5,7 @@ struct list * get_tail(struct list * cursor)
       while (cursor->next != NULL) {
             cursor = cursor->next;
       }
-      return cursort;
+      return cursor;
 }
 
 int list_append(struct list * head, struct list * new)

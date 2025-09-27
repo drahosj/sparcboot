@@ -42,7 +42,7 @@ prom-dev: prom-minimal.o earlyboot.o early_uart.o linkprom-minimal
 
 DDR2PROM_OBJECTS=prom-minimal.o earlyboot.o early_uart.o ddr2spa.o \
 				 trap.o window.o main.o muldiv.o xmodem.o	\
-				 uart.o
+				 uart.o list.o shell.o mmu.o mmus.o
 
 prom-ddr2: $(DDR2PROM_OBJECTS) linkprom
 	$(LD) -T linkprom $(DDR2PROM_OBJECTS) -o prom.elf -L$(LIBDIR) -lc
