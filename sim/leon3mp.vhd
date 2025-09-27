@@ -6,7 +6,7 @@
 --  Copyright (C) 2003 - 2008, Gaisler Research
 --  Copyright (C) 2008 - 2014, Aeroflex Gaisler
 --  Copyright (C) 2015 - 2023, Cobham Gaisler
---  Copyright (C) 2023,        Frontgrade Gaisler
+--  Copyright (C) 2023 - 2025, Frontgrade Gaisler
 --
 --  This program is free software; you can redistribute it and/or modify
 --  it under the terms of the GNU General Public License as published by
@@ -165,8 +165,7 @@ begin
   -- LEON3 processor
   u0 : leon3s
     generic map (hindex=>0, fabtech=>fabtech, memtech=>memtech, dsu=>1, fpu=>0, v8=>2,
-                 mac=>0, isetsize=>8, dsetsize=>8,icen=>1, dcen=>1,tbuf=>2,
-                 rstaddr=>CFG_RSTADDR)
+                 mac=>0, isetsize=>8, dsetsize=>8,icen=>1, dcen=>1,tbuf=>2)
     port map (clkm, rstn, ahbmi, ahbmo(0), ahbsi, ahbso, irqi(0), irqo(0), dbgi(0), dbgo(0));
 
   -- LEON3 Debug Support Unit    
@@ -183,7 +182,7 @@ begin
   dsurx_pad : inpad generic map (tech  => padtech) port map (RsRx, dui.rxd);
   dsutx_pad : outpad generic map (tech => padtech) port map (RsTx, duo.txd);
   led(0) <= not dui.rxd;
- -- led(1) <= not duo.txd;
+  led(1) <= not duo.txd;
 
   ahbjtag0 : ahbjtag generic map(tech => fabtech, hindex => 3)
     port map(rstn, clkm, tck, tms, tdi, tdo, ahbmi, ahbmo(3),
@@ -237,18 +236,6 @@ begin
   brom : entity work.ahbrom
     generic map (hindex => 6, haddr => CFG_AHBRODDR, pipe => CFG_AHBROPIP)
     port map ( rstn, clkm, ahbsi, ahbso(6));
-    
------------------------------------------------------------------------
----  AHB RAM ----------------------------------------------------------
------------------------------------------------------------------------
-
-  ahbramgen : if CFG_AHBRAMEN = 1 generate
-    ahbram0 : ahbram
-      generic map (hindex => 3, haddr => CFG_AHBRADDR, tech => CFG_MEMTECH,
-                   kbytes => CFG_AHBRSZ, pipe => CFG_AHBRPIPE)
-      port map (rstn, clkm, ahbsi, ahbso(3));
-  end generate;
-  nram : if CFG_AHBRAMEN = 0 generate ahbso(3) <= ahbs_none; end generate;
   
 ----------------------------------------------------------------------
 ---  APB Bridge and various periherals -------------------------------
