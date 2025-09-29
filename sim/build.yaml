@@ -277,7 +277,6 @@ libs:
             - sim/axixmem.vhd
             - sim/sramtestmod.vhd
             - sim/delay_wire2.vhd
-            - sim/uartprint.vhd
             - sim/dfi_phy_sim.vhd
             - sim/dfi_phy_sim_fr.vhd
             - jtag/jtag.vhd
