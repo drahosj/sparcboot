@@ -16,9 +16,6 @@ USERCODE_OBJECTS=usermain.o muldiv.o
 
 default: prom.elf
 
-sim/ram.srec: bootram.elf
-	$(PREFIX)-objcopy -O srec -j '.text*' -j '.rodata*' $< $@
-
 bootram.bin: bootram.elf
 	$(PREFIX)-objcopy -O binary  $< $@
 
@@ -62,7 +59,7 @@ flash-image.bin: prom.bin bitfile-headerless
 
 sim: sim/build
 
-sim/build: sim/ram.srec sim/ahbrom.vhd
+sim/build: sim/ahbrom.vhd
 	cd sim && ruby build.rb build
 
 run: sim/build

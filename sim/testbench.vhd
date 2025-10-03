@@ -46,8 +46,7 @@ entity testbench is
 end;
 
 architecture behav of testbench is
-  constant promfile  : string  := "prom.srec";      -- rom contents
-  constant sdramfile : string  := "ram.srec";       -- sdram contents
+  constant sdramfile : string  := "/dev/null";       -- sdram contents
 
   constant ct       : integer := clkperiod/2;
 
@@ -108,11 +107,11 @@ begin
       );
 
   sram0 : sram
-    generic map (index => 4, abits => 24, fname => sdramfile)
+    generic map (index => 4, abits => 24, fname => sdramfile, clear => 1)
     port map (address(23 downto 0), data(31 downto 24), RamCE, writen, oen);
 
   sram1 : sram
-    generic map (index => 5, abits => 24, fname => sdramfile)
+    generic map (index => 5, abits => 24, fname => sdramfile, clear => 1)
     port map (address(23 downto 0), data(23 downto 16), RamCE, writen, oen);
 
     
