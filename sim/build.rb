@@ -19,12 +19,16 @@ ghdl_import_args = [
 ghdl_import_args += ghdl_searchpath
 ghdl_import_args << "--workdir=#{workdir}"
 
+
 ghdl_make_args = [
   '-fexplicit',
   '--ieee=synopsys',
   '--mb-comments',
   '--warn-no-binding',
   '--warn-no-hide',
+  '--syn-binding',
+  '-v',
+  '-Wl,uart-sim.so',
   '-O2',
 ]
 ghdl_make_args << "--workdir=#{workdir}"
@@ -42,7 +46,7 @@ def runcmd(cmd)
   raise "Build failed" if $? != 0
 end
 
-if ARGV[0] == 'build'
+if ARGV[0] == 'import'
   libs.each_pair do |name, lib|
     #workdir = File.join builddir, name
     work = name
@@ -72,12 +76,14 @@ if ARGV[0] == 'build'
       runcmd("ghdl -i #{args.join(' ')} #{f}")
     end
   end
+end
 
+if ARGV[0] == 'make'
   runcmd("ghdl -m #{ghdl_make_args.join(' ')} testbench")
 end
 
 if ARGV[0] == 'run'
-  exec("ghdl -r #{ghdl_run_args.join(' ')} testbench")
+  exec("LD_LIBRARY_PATH=./ ghdl -r #{ghdl_run_args.join(' ')} testbench --vcd=trace.vcd")
 end
 
 puts ARGV[0]

@@ -1,0 +1,44 @@
+OUTPUT_ARCH(sparc)
+__DYNAMIC  =  0;
+
+/* Absolutely minimal linker script for PROM support
+ * 
+ * Only links .text/.rodata section.
+ *
+ * Prom is expected to perform IU initialization
+ * and then jump to RAM.
+ */
+
+MEMORY
+{
+  rom     : ORIGIN = 0x00000000, LENGTH = 12M
+}
+
+/* Most builds place big ram at 0x40000000 */
+/* Assume some ram exists and yolo */
+_LINKSCRIPT_RAM_START = 0x40000000;
+/* SIM ram is 1G */
+_LINKSCRIPT_RAM_END = 0x40000000 + 64M;
+
+/* page table */
+_pt_start = _LINKSCRIPT_RAM_START + 1M;
+
+SECTIONS
+{
+  .text :
+  {
+    . = 0;
+    _trap_table_start = .;
+    *(.text.tt)
+    . = ALIGN (4096);
+    _text_start = .;
+    *(.text)
+    . = ALIGN (16);
+  } > rom
+  .rodata :
+  {
+    _rodata_start = .;
+    *(.rodata)
+    . = ALIGN (16);
+  } > rom
+}

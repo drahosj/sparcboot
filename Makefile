@@ -12,6 +12,9 @@ ASFLAGS=-g
 BOOTRAM_OBJECTS=uart.o early_uart.o trap.o main.o window.o xmodem.o \
 		muldiv.o shell.o mmus.o mmu.o bootram_startup.o
 
+BOOTROM_OBJECTS=uart.o early_uart.o trap.o main.o window.o xmodem.o \
+		muldiv.o shell.o startup.o list.o
+
 USERCODE_OBJECTS=usermain.o muldiv.o
 
 default: prom.elf
@@ -23,7 +26,10 @@ prom.srec: prom.elf
 	$(PREFIX)-objcopy -O srec -j '.text*' -j '.rodata*' $< $@
 
 bootram.elf: $(BOOTRAM_OBJECTS) linkram
-	$(LD) -T linkram $(BOOTRAM_OBJECTS) -L$(LIBDIR) -lc -o bootram.elf
+	$(LD) -T linkram $(BOOTRAM_OBJECTS) -L$(LIBDIR) -lc -o $@
+
+bootrom.elf: $(BOOTROM_OBJECTS) linkram
+	$(LD) -T linkrom $(BOOTROM_OBJECTS) -L$(LIBDIR) -lc -o $@
 
 usercode.elf: $(USERCODE_OBJECTS) linkuser0
 	$(LD) -T linkuser0 $(USERCODE_OBJECTS) -L$(LIBDIR) -lc -o usercode.elf
@@ -47,7 +53,9 @@ prom-ddr2: $(DDR2PROM_OBJECTS) linkprom
 prom-sim: $(DDR2PROM_OBJECTS) linkprom
 	$(LD) -T linkprom-sim $(DDR2PROM_OBJECTS) -o prom.elf -L$(LIBDIR) -lc
 
-prom.elf: prom-sim
+# prom.elf: prom-sim
+prom.elf: bootrom.elf
+	cp $< $@
 
 prom.bin: prom.elf
 	$(PREFIX)-objcopy -O binary -j '.text*' -j '.rodata*' prom.elf prom.bin
@@ -65,8 +73,11 @@ sim/build: sim/ahbrom.vhd
 run: sim/build
 	cd sim && ruby build.rb run
 
-sim/ahbrom.vhd: prom.srec ahbrom.vhd.erb
+sim/ahbrom.vhd: prom-sim prom.srec ahbrom.vhd.erb
 	erb ahbrom.vhd.erb > sim/ahbrom.vhd
+
+ahbrom.vhd: bootrom.elf prom.srec ahbrom.vhd.erb
+	erb ahbrom.vhd.erb > $@
 
 clean:
 	rm -f *.o *.elf *.bin *.srec sim/*.srec sim/ahbrom.vhd

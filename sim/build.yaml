@@ -3,7 +3,7 @@ libs:
     work:
         -  files:
                 - ahbrom.vhd
-                - config.vhd
+                - config_local.vhd
                 - leon3mp.vhd
                 - testbench.vhd
         -   prefix: GRLIB_ROOT

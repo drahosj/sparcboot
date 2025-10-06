@@ -73,7 +73,10 @@ entity leon3mp is
     
     -- USB-RS232 interface
     RsRx            : in    std_logic;
-    RsTx            : out   std_logic
+    RsTx            : out   std_logic;
+
+		urxd 						: in 		std_logic;
+		utxd 						: out		std_logic
   );
 end;
 
@@ -118,8 +121,8 @@ architecture rtl of leon3mp is
   signal lock               : std_logic;
 
   -- RS232 APB Uart (unconnected)
-  signal rxd1 : std_logic;
-  signal txd1 : std_logic;
+  --signal rxd1 : std_logic;
+  --signal txd1 : std_logic;
   
   attribute keep                     : boolean;
   attribute keep of lock             : signal is true;
@@ -256,12 +259,12 @@ begin
   gpti <= gpti_dhalt_drive(dsuo.tstop);
 
   uart1 : apbuart      -- UART 1
-    generic map (pindex   => 1, paddr => 1, pirq => 2, console => 1)
+    generic map (pindex   => 1, paddr => 1, pirq => 2, console => 0)
     port map (rstn, clkm, apbi, apbo(1), u1i, u1o);
-  u1i.rxd    <= rxd1;
+  u1i.rxd    <= urxd;
   u1i.ctsn   <= '0';
   u1i.extclk <= '0';
-  txd1       <= u1o.txd;
+  utxd       <= u1o.txd;
 
 -----------------------------------------------------------------------
 --  Test report module, only used for simulation ----------------------

@@ -19,6 +19,10 @@ void f3() { f4(); early_uart_puts("f3 returning\r\n");}
 void f2() { f3(); early_uart_puts("f2 returning\r\n");}
 void f1() { f2(); early_uart_puts("f1 returning\r\n");}
 
+#define TEST_STACK
+#define TEST_MULDIV
+#define TEST_FIB
+
 void _write(char *b, int len)
 {
       for (int i = 0; i < len; i++) {
@@ -83,8 +87,7 @@ void puth(unsigned int n)
 
 int main()
 {
-      //uart_init();
-
+      early_uart_puts("In main\r\n");
       early_uart_putc('H');
       early_uart_putc('e');
       early_uart_putc('l');
@@ -100,12 +103,12 @@ int main()
       early_uart_putc('\r');
       early_uart_putc('\n');
       
-      early_uart_puts("BIOS PUTS TEST\r\n");
-      early_uart_puts("Second BIOS message\r\n");
-#if 1
+#ifdef TEST_STACK
       f1();
       early_uart_puts("Made it back\r\n");
+#endif
 
+#ifdef TEST_MULDIV
       int ans = 2;
 
       if (7 / 3 == ans) 
@@ -113,10 +116,12 @@ int main()
 
       if (22 % 4 == ans) 
             early_uart_puts("mod is good\r\n");
+#endif
 
       putn(7);
       putn(42);
 
+#ifdef TEST_FIB
       if (fib(0) == 0)
             early_uart_puts("fib(0) good\r\n");
       if (fib(1) == 1)
@@ -143,6 +148,7 @@ int main()
             early_uart_puts("fib(11) good\r\n");
       if (fib(12) == 144)
             early_uart_puts("fib(12) good\r\n");
+#endif
 
       char * foo = "Hello, world\r\n";
       char buf[128];
@@ -161,7 +167,7 @@ int main()
       puth(strtol("0x3bfa", NULL, 0));
       early_uart_putc('\n');
 
-#endif
+#ifdef ALWAYS_LOAD_XMODEM
       early_uart_puts("Receiving code over xmodem to ");
       early_uart_puthexw((unsigned int)  &_LINKSCRIPT_RAM_START);
       early_uart_puts(" ...");
@@ -175,9 +181,9 @@ int main()
       early_uart_getc();
 
       early_uart_puts("Jumping to load address. Here we go!\n\n\n");
-      /*
+
+#endif 
       early_uart_puts("About to call shell_entry\n");
       shell_entry();
       early_uart_puts("somehow shell returned\n");
-      */
 }

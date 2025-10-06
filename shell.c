@@ -55,7 +55,7 @@ static int fn_help()
       return 0;
 }
 
-static struct command cmd_help = {
+static const struct command cmd_help = {
       .name = "help",
       .help = "Help command",
       .fn = fn_help
@@ -94,7 +94,7 @@ static int fn_go()
       return 0;
 }
 
-static struct command cmd_go = {
+static const struct command cmd_go = {
       .name = "go",
       .help = "go <addr>: begin execution at addr",
       .fn = fn_go
@@ -133,7 +133,7 @@ static int fn_xrecv()
       }
 }
 
-static struct command cmd_xrecv = {
+static const struct command cmd_xrecv = {
       .name = "xrecv",
       .help = "xrecv <addr>: load over xmodem to addr",
       .fn = fn_xrecv
@@ -154,7 +154,7 @@ int fn_getvar()
       return 0;
 }
 
-static struct command cmd_getvar = {
+static const struct command cmd_getvar = {
       .name = "get",
       .help = "get <var>: get variabl",
       .fn = fn_getvar
@@ -173,15 +173,23 @@ static struct addr_var ramboot_var = {
 void shell_entry()
 {
       early_uart_puts("Bootloader entry\n\n");
+      /* todo - does commands need to be initialized (BSS zeroed?) */
       list_append(&commands, (struct list *) &cmd_help);
       list_append(&commands, (struct list *) &cmd_xrecv);
       list_append(&commands, (struct list *) &cmd_go);
       list_append(&commands, (struct list *) &cmd_getvar);
 
+#ifdef REGISTER_MMU_COMMANDS
       register_mmu_commands();
+#endif
 
       list_append(&addr_vars, (struct list *) &defuser_var);
       list_append(&addr_vars, (struct list *) &ramboot_var);
+
+#if 0
+      /* Switch to full uart implementation */
+      uart_init();
+#endif
 
       char buf[128];
       for(;;) {

@@ -41,14 +41,15 @@ entity testbench is
     memtech   : integer := CFG_MEMTECH;
     padtech   : integer := CFG_PADTECH;
     clktech   : integer := CFG_CLKTECH;
-    clkperiod : integer := 10           -- system clock period
+    clkperiod : real := 14.3           -- system clock period
     );
 end;
+
 
 architecture behav of testbench is
   constant sdramfile : string  := "/dev/null";       -- sdram contents
 
-  constant ct       : integer := clkperiod/2;
+  constant ct       : real := clkperiod/2.0;
 
   signal clk        : std_logic := '0';
   signal rst        : std_logic := '0';
@@ -76,14 +77,54 @@ architecture behav of testbench is
   -- Output signals for LEDs
   signal led       : std_logic_vector(15 downto 0);
 
+
+  procedure uart_tx (tx : integer) is
+  begin
+    assert false severity failure;
+  end uart_tx;
+
+  procedure uart_tx_bit (tx : std_logic) is
+  begin
+    if tx = '0' then
+      uart_tx(0);
+    else
+      uart_tx(1);
+    end if;
+  end uart_tx_bit;
+
+  function uart_rx return integer is
+  begin
+    assert false severity failure;
+  end uart_rx;
+
+  function uart_rx_bit return std_logic is
+  begin
+    if uart_rx = 0 then
+      return '0';
+    else
+      return '1';
+    end if;
+  end uart_rx_bit;
+
+  attribute foreign of uart_tx : procedure  is "VHPIDIRECT uart_tx";
+  attribute foreign of uart_rx : function  is "VHPIDIRECT uart_rx";
+
 begin
   -- clock and reset
-  clk        <= not clk after ct * 1 ns;
   rst        <= '1', '0' after 100 ns;
   rstn       <= not rst;
   dsubre     <= '0';
-  urxd       <= 'H';
   
+  tickloop : process
+  begin
+    clk <= '1';
+    wait for ct * 1.0 ns;
+    urxd <= uart_rx_bit;
+    uart_tx_bit(utxd);
+    clk <= '0';
+    wait for ct * 1.0 ns;
+  end process;
+
   d3 : entity work.leon3mp
     generic map (fabtech, memtech, padtech, clktech)
     port map (
@@ -103,7 +144,10 @@ begin
       RsTx     => dsutx,
 
       -- Output signals for LEDs
-      led       => led
+      led       => led,
+
+      urxd      => urxd,
+      utxd      => utxd
       );
 
   sram0 : sram

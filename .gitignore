@@ -5,3 +5,4 @@
 sim/build
 *.srec
 sim/ahbrom.vhd
+ahbrom.vhd

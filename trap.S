@@ -81,7 +81,12 @@ segfault_handler:
 trap_table:
 /* TT = 0x00 */
     ISR_JUMP(start)
+#ifdef USE_FANCY_SEGFAULT_HANDLER 
     ISR_JUMP(segfault_handler)
+#else
+/* restart on segfault */
+    ISR_JUMP(start)
+#endif
     UNIMPL_TRAP()
     UNIMPL_TRAP()
     UNIMPL_TRAP()
@@ -91,7 +96,12 @@ trap_table:
 
 /* TT = 0x08 */
     UNIMPL_TRAP()
+#ifdef USE_FANCY_SEGFAULT_HANDLER 
     ISR_JUMP(segfault_handler)
+#else
+/* restart on segfault */
+    ISR_JUMP(start)
+#endif
     UNIMPL_TRAP()
     UNIMPL_TRAP()
     UNIMPL_TRAP()

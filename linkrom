@@ -1,7 +1,10 @@
-/*  linkcmds
- *
- *  $Id: linkcmds,v 1.8.2.1 2000/05/24 17:06:38 joel Exp $
- */
+/* Link script for linking ROM (AHB or SPI
+
+tl; dr: .text fully in ROM, assumes minimal RAM exists (can
+be configured for AHB or DDR), loads everything else and
+provides symbols
+
+*/
 
 OUTPUT_ARCH(sparc)
 __DYNAMIC  =  0;
@@ -33,9 +36,13 @@ __DYNAMIC  =  0;
 
 /* Default values, can be overridden */
 
-_RAM_SIZE = 128M;
+_AHB_RAM_START = 0xA0000000;
+_AHB_RAM_SIZE = 16K;
 
-_RAM_START = 0x40000000;
+_DDR_RAM_START = 0x40000000;
+
+_RAM_START = _AHB_RAM_START;
+_RAM_SIZE = _AHB_RAM_SIZE;
 _RAM_END = _RAM_START + _RAM_SIZE;
 
 /*
@@ -46,6 +53,10 @@ RAM_START = _RAM_START;
 RAM_SIZE = _RAM_SIZE;
 RAM_END = _RAM_END;
 
+_LINKSCRIPT_RAM_START = _RAM_START;
+_LINKSCRIPT_RAM_SIZE = _RAM_SIZE;
+_LINKSCRIPT_RAM_END = _RAM_END;
+
 _LEON_REG = 0x80000000;
 LEON_REG = 0x80000000;
 
@@ -53,7 +64,7 @@ LEON_REG = 0x80000000;
 
 MEMORY
 {
-  ram     : ORIGIN = 0x40000000, LENGTH = 128M
+  ram     : ORIGIN = _RAM_START, LENGTH = _RAM_SIZE
   rom     : ORIGIN = 0x00000000, LENGTH = 64K
 }
 
@@ -65,12 +76,6 @@ SECTIONS
     TRAP_TABLE_START = .;
     *(.text.tt);
     . = ALIGN(0x1000);
-    BIOS_TABLE_START = .;
-    *(.text.bios);
-    . = ALIGN(0x1000);
-    _pt_start = .;
-    . += 0x4000;
-    _pt_end = .;
 
     CREATE_OBJECT_SYMBOLS
     text_start = .;
@@ -156,13 +161,5 @@ SECTIONS
     [ .stabstr ]
   }
 }
-
-bios_putc = BIOS_TABLE_START + 0x00;
-bios_puts = BIOS_TABLE_START + 0x10;
-bios_getc = BIOS_TABLE_START + 0x20;
-bios_getc_nb = BIOS_TABLE_START + 0x30;
-bios_wait = BIOS_TABLE_START + 0x40;
-
-bios_readline = BIOS_TABLE_START + 0x80;
 
 ENTRY(TRAP_TABLE_START)
