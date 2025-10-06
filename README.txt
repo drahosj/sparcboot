@@ -28,3 +28,5 @@ Known issues
 .data not handled
  - variables are broken (segfault)
 
+SOMETHING IS HORRIBLY WRONG WITH COMMANDS
+ - the linked list of commands works DESPITE BEING IN ROM OH GOD
