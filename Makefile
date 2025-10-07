@@ -23,12 +23,12 @@ bootram.bin: bootram.elf
 	$(PREFIX)-objcopy -O binary  $< $@
 
 prom.srec: prom.elf
-	$(PREFIX)-objcopy -O srec -j '.text*' -j '.rodata*' $< $@
+	$(PREFIX)-objcopy -O srec -j '.text*' -j '.rodata*' -j '.data*' $< $@
 
 bootram.elf: $(BOOTRAM_OBJECTS) linkram
 	$(LD) -T linkram $(BOOTRAM_OBJECTS) -L$(LIBDIR) -lc -o $@
 
-bootrom.elf: $(BOOTROM_OBJECTS) linkram
+bootrom.elf: $(BOOTROM_OBJECTS) linkrom
 	$(LD) -T linkrom $(BOOTROM_OBJECTS) -L$(LIBDIR) -lc -o $@
 
 usercode.elf: $(USERCODE_OBJECTS) linkuser0
@@ -58,7 +58,7 @@ prom.elf: bootrom.elf
 	cp $< $@
 
 prom.bin: prom.elf
-	$(PREFIX)-objcopy -O binary -j '.text*' -j '.rodata*' prom.elf prom.bin
+	$(PREFIX)-objcopy -O binary -j '.text*' -j '.rodata*' -j '.data*' prom.elf prom.bin
 
 flash-image.bin: prom.bin bitfile-headerless
 	cp bitfile-headerless flash-image.bin
@@ -78,6 +78,12 @@ sim/ahbrom.vhd: prom-sim prom.srec ahbrom.vhd.erb
 
 ahbrom.vhd: bootrom.elf prom.srec ahbrom.vhd.erb
 	erb ahbrom.vhd.erb > $@
+
+test-application.elf: test-application.o
+	$(PREFIX)-ld -Tlinkram -o test-application.elf test-application.o
+
+test-application.bin: test-application.elf
+	$(PREFIX)-objcopy -O binary -j '.text*' -j '.rodata*' -j '.data*' test-application.elf test-application.bin
 
 clean:
 	rm -f *.o *.elf *.bin *.srec sim/*.srec sim/ahbrom.vhd

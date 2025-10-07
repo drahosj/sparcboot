@@ -55,7 +55,7 @@ static int fn_help()
       return 0;
 }
 
-static const struct command cmd_help = {
+static struct command cmd_help = {
       .name = "help",
       .help = "Help command",
       .fn = fn_help
@@ -69,7 +69,7 @@ static int fn_go()
             early_uart_puts("go <offset>\n");
             return -1;
       }
-      unsigned long offset = strtol(offset_str, NULL, 0);
+      unsigned long offset = strtoul(offset_str, NULL, 0);
       if (offset == 0) {
             struct addr_var * var = get_addr_var(offset_str);
             if (var == NULL) {
@@ -94,7 +94,7 @@ static int fn_go()
       return 0;
 }
 
-static const struct command cmd_go = {
+static struct command cmd_go = {
       .name = "go",
       .help = "go <addr>: begin execution at addr",
       .fn = fn_go
@@ -107,7 +107,7 @@ static int fn_xrecv()
             early_uart_puts("xrecv <offset>\n");
             return -1;
       }
-      unsigned long offset = strtol(offset_str, NULL, 0);
+      unsigned long offset = strtoul(offset_str, NULL, 0);
       if (offset == 0) {
             struct addr_var * var = get_addr_var(offset_str);
             if (var == NULL) {
@@ -119,7 +119,7 @@ static int fn_xrecv()
       early_uart_puts("Loading to offset ");
       putn(offset);
       early_uart_putc('\n');
-      int ret = xmodem_recv(0x40010000);
+      int ret = xmodem_recv(offset);
       early_uart_getc();
       early_uart_putc('\n');
       if (ret > 0) {
@@ -133,7 +133,7 @@ static int fn_xrecv()
       }
 }
 
-static const struct command cmd_xrecv = {
+static struct command cmd_xrecv = {
       .name = "xrecv",
       .help = "xrecv <addr>: load over xmodem to addr",
       .fn = fn_xrecv
@@ -154,7 +154,7 @@ int fn_getvar()
       return 0;
 }
 
-static const struct command cmd_getvar = {
+static struct command cmd_getvar = {
       .name = "get",
       .help = "get <var>: get variabl",
       .fn = fn_getvar
@@ -162,7 +162,7 @@ static const struct command cmd_getvar = {
 
 static struct addr_var defuser_var = {
       .name = "$user",
-      .val = 0x40010000
+      .val = 0xa0002000
 };
 
 static struct addr_var ramboot_var = {

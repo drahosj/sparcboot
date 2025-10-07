@@ -23,6 +23,8 @@ void f1() { f2(); early_uart_puts("f1 returning\r\n");}
 #define TEST_MULDIV
 #define TEST_FIB
 
+char data_msg[] = "Message from .data segment\n";
+
 void _write(char *b, int len)
 {
       for (int i = 0; i < len; i++) {
@@ -166,6 +168,8 @@ int main()
       early_uart_puts("0x3bfa is ");
       puth(strtol("0x3bfa", NULL, 0));
       early_uart_putc('\n');
+
+      early_uart_puts(data_msg);
 
 #ifdef ALWAYS_LOAD_XMODEM
       early_uart_puts("Receiving code over xmodem to ");

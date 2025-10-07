@@ -1,36 +1,29 @@
 OUTPUT_ARCH(sparc)
 __DYNAMIC  =  0;
 
-/* Absolutely minimal linker script for PROM support
- * 
- * Only links .text/.rodata section.
- *
- * Prom is expected to perform IU initialization
- * and then jump to RAM.
+/* Minimal RAM linker script, for after bootloader use.
+ * Loads everything at RAMADDR, expecting proper initialization
+ * (can reuse stack setup from bootloader)
  */
+
+AHBRAM_START = 0xA0001000;
+AHBRAM_SIZE = 12K;
+AHBRAM_END = AHBRAM_START + AHBRAM_SIZE;
+
+RAM_START = AHBRAM_START;
+RAM_END = AHBRAM_END;
 
 MEMORY
 {
-  rom     : ORIGIN = 0x00000000, LENGTH = 12M
-  ram     : ORIGIN = 0x40000000, LENGTH = 128M
+  ram     : ORIGIN = AHBRAM_START, LENGTH = 16K
 }
-
-/* Assume some ram exists and yolo */
-_LINKSCRIPT_DDR2_START = 0x40000000;
-_LINKSCRIPT_DDR2_END = 0x48000000;
-
-/* Use DDR2 */
-_LINKSCRIPT_RAM_START = _LINKSCRIPT_DDR2_START;
-_LINKSCRIPT_RAM_END = _LINKSCRIPT_DDR2_END;
 
 SECTIONS
 {
   .text :
   {
-    _trap_table_start = .;
-    *(.text.tt)
-    . = ALIGN (4096);
     _text_start = .;
+    *(.text.entry)
     *(.text)
     . = ALIGN (16);
   } > ram
@@ -54,5 +47,8 @@ SECTIONS
   } > ram
   . = ALIGN (4096);
   _bss_end = .;
-  _pt_start = .;
 }
+
+early_uart_puts = 0x128c;
+
+ENTRY(_text_start)

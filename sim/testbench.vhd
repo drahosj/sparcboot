@@ -119,8 +119,8 @@ begin
   begin
     clk <= '1';
     wait for ct * 1.0 ns;
-    urxd <= uart_rx_bit;
-    uart_tx_bit(utxd);
+    --urxd <= uart_rx_bit;
+    --uart_tx_bit(utxd);
     clk <= '0';
     wait for ct * 1.0 ns;
   end process;

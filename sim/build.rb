@@ -28,7 +28,7 @@ ghdl_make_args = [
   '--warn-no-hide',
   '--syn-binding',
   '-v',
-  '-Wl,uart-sim.so',
+  #'-Wl,uart-sim.so',
   '-O2',
 ]
 ghdl_make_args << "--workdir=#{workdir}"

@@ -144,7 +144,7 @@ start:
 	nop
 
 
-#if 0
+#if MULTI_CORE
 	/* Get core index into %g3 */
 	mov %asr17, %g3
 	srl %g3, 28, %g3
@@ -215,7 +215,7 @@ start:
 
 	/*3:	set RAMSTART+ RAMSIZE-32, %fp*/
 	3:  set RAM_END - 32, %fp
-#if 0
+#ifdef MULTI_CORE
 	sub %fp, %g1, %fp
 #endif
 	sub %fp, 96, %sp
@@ -230,6 +230,21 @@ start:
 	cmp %g1, %g2
 	bne 1b  
 	nop
+
+#define COPY_DATA
+#ifdef COPY_DATA
+    set _sdata, %g1
+    set _data_load_start, %g2
+    set _edata, %g3
+1:
+    ld  [%g2], %g4
+    st  %g4, [%g1]
+    add %g1, 4, %g1
+    add %g2, 4, %g2
+    cmp %g1, %g3
+    bl  1b
+    nop
+#endif
 
 	set main, %g1
 

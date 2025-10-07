@@ -70,7 +70,7 @@ MEMORY
 
 SECTIONS
 {
-  .text :
+  .text 0x0000 :
   {
     /* Begin with trap table at entry address */
     TRAP_TABLE_START = .;
@@ -126,6 +126,7 @@ SECTIONS
   .hash		  : { *(.hash)		} >ram
   .data :
   {
+    _data_load_start = LOADADDR(.data);
     data_start = .;
     _data_start = .;
     _sdata = . ;
@@ -135,7 +136,7 @@ SECTIONS
     . = ALIGN(0x10);
     edata = .;
     _edata = .;
-  } > ram
+  } > ram AT> rom
   .shbss :
   {
     *(.shbss)
